@@ -17,9 +17,39 @@
             width: 100%;
             box-sizing: border-box;
         }
+        #top_container{
+            position: absolute;
+            top: 0;
+            width: 100vw;
+            height: 10vh;
+            background-color: grey;
+        }
+        #rightHalf{
+         position: absolute;
+         right: 0;
+         top: 10vh;
+         width: 50vw;
+         height: 90vh;
+         background-color: antiquewhite;
+        }
+        #leftHalf{
+            position: absolute;
+            top: 10vh;
+            left: 0;
+            height: 90vh;
+            width: 50vw;
+            background-color: green;
+        }
+
+        .month_buttons{
+            background-color: blue;
+            color: white;
+        }
         #wrapper2{
             height: 350px;
             width: 300px;
+            padding-left: 8vw;
+            
         }
         .container {
             background-color: white;
@@ -104,21 +134,351 @@
         .popup .cancel-btn:hover {
             background-color: #c82333;
         }
-    </style>
+
+        /*ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg*/
+        /*ggggggggggggggggggggfdaylyfinancesggggggggggggggggggggggggggg*/
+        /*ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg*/
+        /*ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg*/
+        .daylyFinancesContainer {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 1100px;
+            margin: 10px;
+        }
+        .left {
+            width: 44.5%;
+            border-right: 1px solid #ccc;
+            position: absolute;
+            left: 0;
+            background-color: #2196F3;
+            top: 0;
+        }
+        #rightInputs {
+            width: 55%;
+            background-color: #4c96af;
+            position: absolute;
+           right: 0;
+        }
+        h1 {
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 0.2vh;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 0.2vh;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 0.2vh;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .input-group button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .input-group button:hover {
+            background-color: #45a049;
+        }
+        .info {
+            
+            display: flex;
+            justify-content: space-between;
+        }
+        .day-list {
+            
+            max-height: 400px;
+            
+            overflow-y: auto;
+
+        }
+        .day-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            font-size: 0.8vw;
+        }
+
+        .earned {
+            background-color: #4CAF50;
+            font-weight: 900;
+            border-radius: 4px;
+        }
+        .spent {
+            background-color: #FF9800;
+            font-weight: 900;
+            border-radius: 4px;
+        }
+        .remaining {
+            background-color: #2196F3;
+            font-weight: 900;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                flex-direction: column;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+        }
+        /*ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg*/
+        /*ggggggggggggggggggggfdaylyfinancesggggggggggggggggggggggggggg*/
+        /*ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg*/
+        /*ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg*/
+            </style>
 </head>
 <body>
+    <div id="top_container"></div>
+    <div id="leftHalf">
+        <div class="containerSurvival">
+            <h2>Money Survival Calculator</h2>
+            <label for="monthlyOutcome">Your Average Monthly Expenses ($):</label>
+            <input type="number" id="monthlyOutcome" placeholder="Enter monthly expenses" oninput="calculateDays()">
+            
+            <label for="totalMoney">Your Total Savings ($):</label>
+            <input type="number" id="totalMoney" placeholder="Enter total savings" oninput="calculateDays()">
+            
+            <div class="result" id="result">Enter values to calculate.</div>
+        </div>
+    </div>
+    <div id="rightHalf">
+        <div class="left">
+            <h2 id="title_31">Last 31 Days</h2>
+            <div class="day-list" id="dayList"></div>
+        </div>
+        <div id="rightInputs">
+            <div class="input-group">
+                <label for="hourlyRate">Hourly Rate ($)</label>
+                <input type="number" id="hourlyRate" placeholder="Enter your hourly rate">
+            </div>
+
+            <div class="input-group">
+                <label for="hoursWorked">Hours Worked Today</label>
+                <input type="number" id="hoursWorked" placeholder="Enter hours worked today">
+            </div>
+
+            <div class="input-group">
+                <label for="dailyExpenses">Daily Expenses ($)</label>
+                <input type="number" id="dailyExpenses" placeholder="Enter today's expenses">
+            </div>
+
+            <div class="input-group">
+                <button id="addWorkDayButton">Add Work Day</button>
+            </div>
+
+            <div class="info">
+                <span>Total Earned: $<span id="totalEarned">0</span></span>
+                <span>Remaining Balance: $<span id="remainingBalance">0</span></span>
+            </div>
+        <button class="month_buttons" onclick="changeMonth('January')">January</button>
+        <button class="month_buttons" onclick="changeMonth('February')"  >February</button>
     <div id="wrapper2">
      <div id="container"></div>
     </div>
+   </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
 
+
+
+
+function daylyExpensesMainFunction() {
+            // Retrieve stored data from localStorage
+        let workData = JSON.parse(localStorage.getItem("workData")) || {
+            hourlyRate: 20,  // Default hourly rate if no previous data exists
+            workDays: [],
+            totalEarned: 0,
+            remainingBalance: 0
+        };
+
+        // Set the default hourly rate in the input field
+        document.getElementById("hourlyRate").value = workData.hourlyRate;
+        const tritler = document.getElementById("title_31");
+       
+
+
+
+        let total3 = 0;
+
+        workData.workDays.forEach(elem => {
+            
+            total3 += elem.hoursWorked
+    
+         });
+
+        tritler.innerText = `Total_hours_${total3}`
+
+        // Update displayed income and work details
+        function updateDisplay() {
+            document.getElementById("totalEarned").innerText = workData.totalEarned.toFixed(2);
+            document.getElementById("remainingBalance").innerText = workData.remainingBalance.toFixed(2);
+            displayWorkDays();
+            
+        }
+
+        // Display the list of workdays (last 31 days)
+        function displayWorkDays() {
+            const dayListElement = document.getElementById("dayList");
+            dayListElement.innerHTML = ""; // Clear current list
+
+            // Show only the last 31 days
+            const last31Days = workData.workDays.slice(-31);
+            last31Days.forEach((workDay) => {
+                const dayElement = document.createElement("div");
+                dayElement.classList.add("day-item");
+               
+                const dayDate = new Date(workDay);
+                dayElement.innerHTML = `
+                    <span>${workDay.date}</span>
+                    <span>_${workDay.hoursWorked}_</span>
+                    <span class="earned">${workDay.earnedAmount.toFixed(2)}</span>
+                    <span class="spent">${workDay.expenses.toFixed(2)}</span>
+                    <span class="remaining">${workDay.remainingBalance.toFixed(2)}</span>
+                `;
+                dayListElement.appendChild(dayElement);
+            });
+        }
+
+        // Add work day to the data
+        function addWorkDay() {
+            const hourlyRate = parseFloat(document.getElementById("hourlyRate").value);
+            const hoursWorked = parseFloat(document.getElementById("hoursWorked").value);
+            const dailyExpenses = parseFloat(document.getElementById("dailyExpenses").value);
+
+            if (isNaN(hourlyRate) || isNaN(hoursWorked) || isNaN(dailyExpenses) || hourlyRate <= 0 || hoursWorked <= 0 || dailyExpenses < 0) {
+                alert("Please enter valid hourly rate, hours worked, and expenses.");
+                return;
+            }
+
+            function getFormattedDate(date = new Date()) {
+               const day = date.getDate();
+               const month = date.getMonth() + 1; // Months are 0-based
+               const year = date.getFullYear(); 
+               const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+               const dayOfWeek = daysOfWeek[date.getDay()];
+               
+               return `${month}/${day}/${dayOfWeek}`;
+            }
+
+            // Store the hourly rate in localStorage for future use
+            workData.hourlyRate = hourlyRate;
+
+            const earnedAmount = hourlyRate * hoursWorked;
+            const remainingBalance = earnedAmount - dailyExpenses;
+            const today = getFormattedDate();
+            console.log(today)
+            const workDay = {
+                date: today,
+                hoursWorked,
+                earnedAmount,
+                expenses: dailyExpenses,
+                remainingBalance
+            };
+
+            // Update workData
+            workData.workDays.push(workDay);
+            workData.totalEarned += earnedAmount;
+            workData.remainingBalance += remainingBalance;
+
+            // Save updated data to localStorage
+            localStorage.setItem("workData", JSON.stringify(workData));
+
+            // Clear input fields
+            document.getElementById("hourlyRate").value = "";
+            document.getElementById("hoursWorked").value = "";
+            document.getElementById("dailyExpenses").value = "";
+
+            updateDisplay();
+        }
+
+        // Initialize the display when the page loads
+        document.getElementById("addWorkDayButton").addEventListener("click", addWorkDay);
+        updateDisplay(); 
+        }
+        
+
+daylyExpensesMainFunction();
+
+function calculateDays() {
+            let monthlyOutcome = parseFloat(document.getElementById('monthlyOutcome').value);
+            let totalMoney = parseFloat(document.getElementById('totalMoney').value);
+            let resultDiv = document.getElementById('result');
+            
+            if (!isNaN(monthlyOutcome) && monthlyOutcome > 0 && !isNaN(totalMoney) && totalMoney > 0) {
+                let dailyOutcome = monthlyOutcome / 30; // Assume 30 days in a month
+                let totalDays = Math.floor(totalMoney / dailyOutcome);
+                let months = Math.floor(totalDays / 30);
+                let days = totalDays % 30;
+                
+                let today = new Date();
+                let endDate = new Date();
+                endDate.setDate(today.getDate() + totalDays);
+                
+                let options = { year: 'numeric', month: 'long', day: 'numeric' };
+                let formattedDate = endDate.toLocaleDateString(undefined, options);
+                
+                resultDiv.innerText = `You can sustain yourself for approximately ${months} months and ${days} days, until ${formattedDate}.`;
+            } else {
+                resultDiv.innerText = 'Enter valid numbers to calculate.';
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+     
+     const allVariables = {
+        updateGraphOnce: true,
+     };
+     function updateOnce() {
+        mainFunction("January")
+        allVariables.updateGraphOnce = false;
+     }
+     allVariables.updateGraphOnce && updateOnce();
+
+
+     function changeMonth(name) {
+        document.getElementById("container").innerHTML = '';
+        mainFunction(name);
+     }
+     
+
+
         function mainFunction(the_name) {
-            const monthName = the_name; // You can set it dynamically if needed
+            const monthName = the_name;
+             // You can set it dynamically if needed
         let budgetData = JSON.parse(localStorage.getItem(monthName)) || { expenses: [] };
         let selectedExpenseIndex = null;
 
         function updateChart() {
+            
+            
             const total = budgetData.expenses.reduce((sum, expense) => sum + expense.amount, 0);
             const labels = budgetData.expenses.map(expense => `${expense.category}: $${expense.amount} (${((expense.amount / total) * 100).toFixed(2)}%)`);
             const amounts = budgetData.expenses.map(expense => expense.amount);
@@ -320,9 +680,11 @@
 
         // Update the chart initially
         updateChart();
+        
+        
         }
 
-        mainFunction("February");
+       
         
        
     </script>

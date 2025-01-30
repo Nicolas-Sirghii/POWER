@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Money Survival Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        .container { max-width: 400px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 10px; }
+        input { width: 100%; padding: 8px; margin: 10px 0; }
+        .result { font-size: 20px; margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="containerSurvival">
+        <h2>Money Survival Calculator</h2>
+        <label for="monthlyOutcome">Your Average Monthly Expenses ($):</label>
+        <input type="number" id="monthlyOutcome" placeholder="Enter monthly expenses" oninput="calculateDays()">
+        
+        <label for="totalMoney">Your Total Savings ($):</label>
+        <input type="number" id="totalMoney" placeholder="Enter total savings" oninput="calculateDays()">
+        
+        <div class="result" id="result">Enter values to calculate.</div>
+    </div>
+
+    <script>
+        function calculateDays() {
+            let monthlyOutcome = parseFloat(document.getElementById('monthlyOutcome').value);
+            let totalMoney = parseFloat(document.getElementById('totalMoney').value);
+            let resultDiv = document.getElementById('result');
+            
+            if (!isNaN(monthlyOutcome) && monthlyOutcome > 0 && !isNaN(totalMoney) && totalMoney > 0) {
+                let dailyOutcome = monthlyOutcome / 30; // Assume 30 days in a month
+                let totalDays = Math.floor(totalMoney / dailyOutcome);
+                let months = Math.floor(totalDays / 30);
+                let days = totalDays % 30;
+                
+                let today = new Date();
+                let endDate = new Date();
+                endDate.setDate(today.getDate() + totalDays);
+                
+                let options = { year: 'numeric', month: 'long', day: 'numeric' };
+                let formattedDate = endDate.toLocaleDateString(undefined, options);
+                
+                resultDiv.innerText = `You can sustain yourself for approximately ${months} months and ${days} days, until ${formattedDate}.`;
+            } else {
+                resultDiv.innerText = 'Enter valid numbers to calculate.';
+            }
+        }
+    </script>
+</body>
+</html>

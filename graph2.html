@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Income & Outcome Graph</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        canvas {
+            max-width: 800px;
+            width: 100%;
+            height: 400px;
+            margin: auto;
+        }
+        input {
+            margin: 10px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Daily Income & Outcome Tracker</h2>
+    <label>Income: </label><input type="number" id="income" placeholder="Enter income">
+    <label>Outcome: </label><input type="number" id="outcome" placeholder="Enter outcome">
+    <button onclick="addData()">Add</button>
+    <canvas id="myChart"></canvas>
+    
+    <p id="avg-90">Average Income (Last 90 Days): 0 | Average Outcome (Last 90 Days): 0</p>
+    <p id="avg-30">Average Income (Last 30 Days): 0 | Average Outcome (Last 30 Days): 0</p>
+    <p id="avg-7">Average Income (Last 7 Days): 0 | Average Outcome (Last 7 Days): 0</p>
+
+    <script>
+
+      
+        let incomeData = JSON.parse(localStorage.getItem("incomeData")) || [];
+        let outcomeData = JSON.parse(localStorage.getItem("outcomeData")) || [];
+        let labels = JSON.parse(localStorage.getItem("labels")) || [];
+        
+        const getCurrentDate = () => new Date().toISOString().split('T')[0];
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Income',
+                        borderColor: 'green',
+                        data: incomeData.reduce((acc, val, i) => {
+                            acc.push((acc[i - 1] || 0) + val);
+                            return acc;
+                        }, []),
+                        fill: false
+                    },
+                    {
+                        label: 'Outcome',
+                        borderColor: 'red',
+                        data: outcomeData.reduce((acc, val, i) => {
+                            acc.push((acc[i - 1] || 0) + val);
+                            return acc;
+                        }, []),
+                        fill: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function addData() {
+            let income = parseFloat(document.getElementById("income").value) || 0;
+            let outcome = parseFloat(document.getElementById("outcome").value) || 0;
+            
+            labels.push(getCurrentDate());
+            incomeData.push(income + (incomeData.length > 0 ? incomeData[incomeData.length - 1] : 0));
+            outcomeData.push(outcome + (outcomeData.length > 0 ? outcomeData[outcomeData.length - 1] : 0));
+            
+            localStorage.setItem("incomeData", JSON.stringify(incomeData));
+            localStorage.setItem("outcomeData", JSON.stringify(outcomeData));
+            localStorage.setItem("labels", JSON.stringify(labels));
+            
+            updateAverages();
+            chart.update();
+        }
+
+        function calculateAverage(data, days) {
+            const relevantData = data.slice(-days);
+            const sum = relevantData.reduce((a, b) => a + b, 0);
+            return (relevantData.length > 0) ? (sum / relevantData.length).toFixed(2) : 0;
+        }
+
+        function updateAverages() {
+            document.getElementById("avg-90").innerText = `Average Income (Last 90 Days): ${calculateAverage(incomeData, 90)} | Average Outcome (Last 90 Days): ${calculateAverage(outcomeData, 90)}`;
+            document.getElementById("avg-30").innerText = `Average Income (Last 30 Days): ${calculateAverage(incomeData, 30)} | Average Outcome (Last 30 Days): ${calculateAverage(outcomeData, 30)}`;
+            document.getElementById("avg-7").innerText = `Average Income (Last 7 Days): ${calculateAverage(incomeData, 7)} | Average Outcome (Last 7 Days): ${calculateAverage(outcomeData, 7)}`;
+        }
+
+        updateAverages();
+    </script>
+</body>
+</html>
