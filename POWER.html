@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        #wrapper2{
+            height: 350px;
+            width: 300px;
+        }
+        .container {
+            background-color: white;
+            padding: 2%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 95%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .input-group {
+            margin-bottom: 4%;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 2%;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 2%;
+            margin: 2% 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .input-group button, .add-expense-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 70%;
+            margin-top: 2%;
+        }
+        .input-group button:hover, .add-expense-btn:hover {
+            background-color: #45a049;
+        }
+        #chart {
+            width: 100%;
+            height: 40vh;
+            margin-top: 4%;
+        }
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 5%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+        .popup input {
+            width: 80%;
+            padding: 2%;
+            margin: 3% 0;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+        .popup button {
+            padding: 3% 5%;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 80%;
+            margin-top: 2%;
+        }
+        .popup button:hover {
+            background-color: #0056b3;
+        }
+        .popup .cancel-btn {
+            background-color: #dc3545;
+            margin-top: 2%;
+        }
+        .popup .cancel-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div id="wrapper2">
+     <div id="container"></div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+
+        function mainFunction(the_name) {
+            const monthName = the_name; // You can set it dynamically if needed
+        let budgetData = JSON.parse(localStorage.getItem(monthName)) || { expenses: [] };
+        let selectedExpenseIndex = null;
+
+        function updateChart() {
+            const total = budgetData.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const labels = budgetData.expenses.map(expense => `${expense.category}: $${expense.amount} (${((expense.amount / total) * 100).toFixed(2)}%)`);
+            const amounts = budgetData.expenses.map(expense => expense.amount);
+            const ctx = document.getElementById('chart').getContext('2d');
+
+            if (window.myChart) window.myChart.destroy();
+
+            window.myChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels.length ? labels : ["No expenses yet"],
+                    datasets: [{
+                        label: 'Expenses',
+                        data: amounts.length ? amounts : [1],
+                        backgroundColor: ["#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#FFD700"],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    onClick: (event, elements) => {
+                        if (elements.length) {
+                            selectedExpenseIndex = elements[0].index;
+                            document.getElementById(`popup_${monthName}`).style.display = 'block';
+                        }
+                    }
+                }
+            });
+        }
+
+        function createElements() {
+            // Main container
+            const container = document.getElementById('container');
+            const divContainer = document.createElement('div');
+            divContainer.classList.add('container');
+            divContainer.id = `container_${monthName}`;
+            container.appendChild(divContainer);
+
+            // Add Expense button
+            const addExpenseBtn = document.createElement('button');
+            addExpenseBtn.classList.add('add-expense-btn');
+            addExpenseBtn.id = `addExpenseBtn_${monthName}`;
+            addExpenseBtn.textContent = monthName;
+            addExpenseBtn.onclick = openAddExpensePopup;
+            divContainer.appendChild(addExpenseBtn);
+
+            // Chart Canvas
+            const canvas = document.createElement('canvas');
+            canvas.id = 'chart';
+            divContainer.appendChild(canvas);
+
+            // Add Expense Popup
+            const addExpensePopup = document.createElement('div');
+            addExpensePopup.classList.add('popup');
+            addExpensePopup.id = `addExpensePopup_${monthName}`;
+            divContainer.appendChild(addExpensePopup);
+
+            const addExpenseTitle = document.createElement('h3');
+            addExpenseTitle.textContent = 'Add Expense';
+            addExpensePopup.appendChild(addExpenseTitle);
+
+            const expenseNameInput = document.createElement('input');
+           
+            expenseNameInput.placeholder = 'Expense name';
+            expenseNameInput.id = `expenceName_${monthName}`;
+            addExpensePopup.appendChild(expenseNameInput);
+
+            const expenseAmountInput = document.createElement('input');
+            expenseAmountInput.id = 'expenseAmount';
+            expenseAmountInput.id = `expenseAmount_${monthName}`
+            expenseAmountInput.type = 'number';
+            expenseAmountInput.placeholder = 'Amount';
+            addExpensePopup.appendChild(expenseAmountInput);
+
+            const addBtn = document.createElement('button');
+            addBtn.textContent = 'Add';
+            addBtn.id = `add_${monthName}`
+            addBtn.onclick = addExpense;
+            addExpensePopup.appendChild(addBtn);
+
+            const cancelAddBtn = document.createElement('button');
+            cancelAddBtn.classList.add('cancel-btn');
+            cancelAddBtn.textContent = 'Cancel';
+            cancelAddBtn.id = `cancel_${monthName}`
+            cancelAddBtn.onclick = closeAddExpensePopup;
+            addExpensePopup.appendChild(cancelAddBtn);
+
+            // Update Expense Popup
+            const popup = document.createElement('div');
+            popup.classList.add('popup');
+            popup.id = `popup_${monthName}`;
+
+            divContainer.appendChild(popup);
+
+            const popupTitle = document.createElement('h3');
+            popupTitle.textContent = 'Update Expense';
+            popup.appendChild(popupTitle);
+
+            const updateAmountInput = document.createElement('input');
+            updateAmountInput.id = 'updateAmount';
+            updateAmountInput.id = `updateAmount_${monthName}`
+            updateAmountInput.type = 'number';
+            updateAmountInput.placeholder = 'Enter new amount or additional amount';
+            popup.appendChild(updateAmountInput);
+
+            const updateBtn = document.createElement('button');
+            updateBtn.textContent = 'Update';
+            updateBtn.onclick = updateExpense;
+            updateBtn.id = `updateBtn_${monthName}`
+            popup.appendChild(updateBtn);
+
+            const deleteBtn = document.createElement('button');
+            deleteBtn.classList.add('cancel-btn');
+            deleteBtn.textContent = 'Delete';
+            deleteBtn.id = `Delete_${monthName}`
+            deleteBtn.onclick = deleteExpense;
+            popup.appendChild(deleteBtn);
+
+            const replaceBtn = document.createElement('button');
+            replaceBtn.textContent = 'Replace';
+            replaceBtn.onclick = replaceExpense;
+            popup.appendChild(replaceBtn);
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.classList.add('cancel-btn');
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.id = `Cancel__${monthName}`
+            cancelBtn.onclick = closePopup;
+            popup.appendChild(cancelBtn);
+        }
+
+        function updateExpense() {
+            const additionalAmount = parseFloat(document.getElementById(`updateAmount_${monthName}`).value);
+            if (!isNaN(additionalAmount) && additionalAmount > 0 && selectedExpenseIndex !== null) {
+                budgetData.expenses[selectedExpenseIndex].amount += additionalAmount;
+                localStorage.setItem(monthName, JSON.stringify(budgetData));
+                updateChart();
+                closePopup();
+            } else {
+                alert("Please enter a valid amount.");
+            }
+            clearInputField();
+        }
+
+        function deleteExpense() {
+            if (selectedExpenseIndex !== null) {
+                budgetData.expenses.splice(selectedExpenseIndex, 1);
+                localStorage.setItem(monthName, JSON.stringify(budgetData));
+                updateChart();
+                closePopup();
+            }
+            clearInputField();
+        }
+        function replaceExpense() {
+            const newAmount = parseFloat(document.getElementById(`updateAmount_${monthName}`).value);
+            if (!isNaN(newAmount) && newAmount > 0 && selectedExpenseIndex !== null) {
+                budgetData.expenses[selectedExpenseIndex].amount = newAmount;
+                localStorage.setItem(monthName, JSON.stringify(budgetData));
+                updateChart();
+                closePopup();
+            } else {
+                alert("Please enter a valid amount.");
+            }
+            clearInputField();
+        }
+
+        function closePopup() {
+            document.getElementById(`popup_${monthName}`).style.display = 'none';
+        }
+
+        function openAddExpensePopup() {
+            document.getElementById(`addExpensePopup_${monthName}`).style.display = 'block';
+        }
+
+        function closeAddExpensePopup() {
+            document.getElementById(`addExpensePopup_${monthName}`).style.display = 'none';
+        }
+
+        function addExpense() {
+            const name = document.getElementById(`expenceName_${monthName}`).value;
+            const amount = parseFloat(document.getElementById(`expenseAmount_${monthName}`).value);
+            if (name && !isNaN(amount) && amount > 0) {
+                budgetData.expenses.push({ category: name, amount: amount });
+                localStorage.setItem(monthName, JSON.stringify(budgetData));
+                updateChart();
+                closeAddExpensePopup();
+            } else {
+                alert("Please enter a valid name and amount.");
+            }
+            clearInputField();
+        }
+
+        // Clear the input field after an action
+        function clearInputField() {
+            document.getElementById(`updateAmount_${monthName}`).value = '';
+        }
+
+        // Initialize the page by creating the elements dynamically
+        createElements();
+
+        // Update the chart initially
+        updateChart();
+        }
+
+        mainFunction("February");
+        
+       
+    </script>
+</body>
+</html>
+
