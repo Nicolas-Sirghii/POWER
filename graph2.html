@@ -8,7 +8,7 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f7fa; }
-        .container { display: flex; flex-direction: column; align-items: center; width: 90vw; max-width: 800px; height: 90vh; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
+        .Linearcontainer { display: flex; flex-direction: column; align-items: center; width: 90vw; max-width: 800px; height: 90vh; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); }
         h1 { color: #333; }
         .inputs { display: flex; gap: 10px; margin-bottom: 10px; }
         input { padding: 10px; font-size: 16px; border: 1px solid #ccc; border-radius: 5px; width: 120px; text-align: center; }
@@ -23,7 +23,7 @@
 </head>
 <body>
 
-    <div class="container">
+    <div class="Linearcontainer">
         <h1>Income vs Outcome Tracker</h1>
 
         <div class="inputs">
@@ -51,26 +51,54 @@
     </div>
 
     <script>
+
+
+      
         const ctx = document.getElementById('myChart').getContext('2d');
         let labels = [], incomeData = [], outcomeData = [];
         let cumulativeIncome = 0, cumulativeOutcome = 0;
         let myChart;
 
         function loadSavedData() {
-            const savedData = JSON.parse(localStorage.getItem('financeData'));
-            if (savedData) {
-                labels = savedData.labels || [];
-                incomeData = savedData.incomeData || [];
-                outcomeData = savedData.outcomeData || [];
-                cumulativeIncome = savedData.cumulativeIncome || 0;
-                cumulativeOutcome = savedData.cumulativeOutcome || 0;
+            const savedData = JSON.parse(localStorage.getItem("POWER"));
+            if (savedData.linearGraph) {
+                labels = savedData.linearGraph.labels || [];
+                incomeData = savedData.linearGraph.incomeData || [];
+                outcomeData = savedData.linearGraph.outcomeData || [];
+                cumulativeIncome = savedData.linearGraph.cumulativeIncome || 0;
+                cumulativeOutcome = savedData.linearGraph.cumulativeOutcome || 0;
             }
         }
 
         function saveData() {
-            localStorage.setItem('financeData', JSON.stringify({
-                labels, incomeData, outcomeData, cumulativeIncome, cumulativeOutcome
-            }));
+            const POWER = {
+        pizzaGraph: {
+            January: { expenses: [] },
+            February: { expenses: [] },
+            March: { expenses: [] },
+            April: { expenses: [] },
+            May: { expenses: [] },
+            June: { expenses: [] },
+            July: { expenses: [] },
+            August: { expenses: [] },
+            September: { expenses: [] },
+            October: { expenses: [] },
+            November: { expenses: [] },
+            December: { expenses: [] },
+        },
+        linearGraph: {labels, incomeData, outcomeData, cumulativeIncome, cumulativeOutcome}
+    };
+
+            let power = JSON.parse(localStorage.getItem("POWER"));
+            if (power) {
+                power.linearGraph = {labels, incomeData, outcomeData, cumulativeIncome, cumulativeOutcome}; 
+            } else {
+                power = POWER
+            }
+            
+
+
+            localStorage.setItem('POWER', JSON.stringify(power));
         }
 
         function getCurrentDate() {
@@ -149,6 +177,9 @@
         loadSavedData();
         createChart();
         updateChart();
+      
+     
+    
     </script>
 
 </body>
