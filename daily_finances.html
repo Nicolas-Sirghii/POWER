@@ -156,166 +156,13 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        
 
-        function daylyExpensesMainFunction() {
-            // Retrieve stored data from localStorage
-        let workData = JSON.parse(localStorage.getItem("workData")) || {
-            hourlyRate: 20,  // Default hourly rate if no previous data exists
-            workDays: [],
-            totalEarned: 0,
-            remainingBalance: 0
-        };
+     
 
-        // Set the default hourly rate in the input field
-        document.getElementById("hourlyRate").value = workData.hourlyRate;
-        const tritler = document.getElementById("title_31");
-       
-
-
-
-        let total3 = 0;
-
-        workData.workDays.forEach(elem => {
-            
-            total3 += elem.hoursWorked
-    
-         });
-
-        tritler.innerText = `Total_hours_${total3}`
-
-        // Update displayed income and work details
-        function updateDisplay() {
-            document.getElementById("totalEarned").innerText = workData.totalEarned.toFixed(2);
-            document.getElementById("remainingBalance").innerText = workData.remainingBalance.toFixed(2);
-            displayWorkDays();
-            updateChart();
-        }
-
-        // Display the list of workdays (last 31 days)
-        function displayWorkDays() {
-            const dayListElement = document.getElementById("dayList");
-            dayListElement.innerHTML = ""; // Clear current list
-
-            // Show only the last 31 days
-            const last31Days = workData.workDays.slice(-31);
-            last31Days.forEach((workDay) => {
-                const dayElement = document.createElement("div");
-                dayElement.classList.add("day-item");
-
-                const dayDate = new Date(workDay.date).toLocaleDateString();
-                dayElement.innerHTML = `
-                    <span>${dayDate}</span>
-                    <span>___hours_${workDay.hoursWorked}_</span>
-                    <span class="earned">Earned: $${workDay.earnedAmount.toFixed(2)}</span>
-                    <span class="spent">Spent: $${workDay.expenses.toFixed(2)}</span>
-                    <span class="remaining">Remaining: $${workDay.remainingBalance.toFixed(2)}</span>
-                `;
-                dayListElement.appendChild(dayElement);
-            });
-        }
-
-        // Add work day to the data
-        function addWorkDay() {
-            const hourlyRate = parseFloat(document.getElementById("hourlyRate").value);
-            const hoursWorked = parseFloat(document.getElementById("hoursWorked").value);
-            const dailyExpenses = parseFloat(document.getElementById("dailyExpenses").value);
-
-            if (isNaN(hourlyRate) || isNaN(hoursWorked) || isNaN(dailyExpenses) || hourlyRate <= 0 || hoursWorked <= 0 || dailyExpenses < 0) {
-                alert("Please enter valid hourly rate, hours worked, and expenses.");
-                return;
-            }
-
-            // Store the hourly rate in localStorage for future use
-            workData.hourlyRate = hourlyRate;
-
-            const earnedAmount = hourlyRate * hoursWorked;
-            const remainingBalance = earnedAmount - dailyExpenses;
-            const today = new Date();
-
-            const workDay = {
-                date: today.toISOString(),
-                hoursWorked,
-                earnedAmount,
-                expenses: dailyExpenses,
-                remainingBalance
-            };
-
-            // Update workData
-            workData.workDays.push(workDay);
-            workData.totalEarned += earnedAmount;
-            workData.remainingBalance += remainingBalance;
-
-            // Save updated data to localStorage
-            localStorage.setItem("workData", JSON.stringify(workData));
-
-            // Clear input fields
-            document.getElementById("hourlyRate").value = "";
-            document.getElementById("hoursWorked").value = "";
-            document.getElementById("dailyExpenses").value = "";
-
-            updateDisplay();
-        }
-
-        // Update bar chart data for earnings growth
-        function updateChart() {
-            const labels = workData.workDays.slice(-31).map(workDay => new Date(workDay.date).toLocaleDateString());
-            const data = workData.workDays.slice(-31).map(workDay => workDay.remainingBalance);
-
-            const ctx = document.getElementById('chart').getContext('2d');
-
-
-                if (window.chartInstance) {
-                window.chartInstance.destroy(); // Destroy previous chart to prevent stacking charts
-            }
-
-            window.chartInstance = new Chart(ctx, {
-                type: 'bar', // Bar chart
-                data: {
-                    labels: labels.length ? labels : ["No data yet"],
-                    datasets: [{
-                        label: 'Remaining Balance Over Time',
-                        data: data.length ? data : [0],
-                        backgroundColor: "#4CAF50",
-                        borderColor: "#4CAF50",
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(tooltipItem) {
-                                    return 'Remaining Balance: $' + tooltipItem.raw.toFixed(2);
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Date'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Amount ($)'
-                            },
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Initialize the display when the page loads
-        document.getElementById("addWorkDayButton").addEventListener("click", addWorkDay);
-        updateDisplay(); 
-        }
-        // Retrieve stored data from localStorage
-        let workData = JSON.parse(localStorage.getItem("workData")) || {
+        function main () {
+  // Retrieve stored data from localStorage
+  let workData = JSON.parse(localStorage.getItem("workData")) || {
             hourlyRate: 20,  // Default hourly rate if no previous data exists
             workDays: [],
             totalEarned: 0,
@@ -469,6 +316,8 @@
         // Initialize the display when the page loads
         document.getElementById("addWorkDayButton").addEventListener("click", addWorkDay);
         updateDisplay();
+        }
+      
     </script>
 
 </body>

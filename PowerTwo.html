@@ -104,15 +104,16 @@
             display: flex;
             flex-direction: column; 
             align-items: center;
-            width: 90vw;
+            width: 30vw;
             max-width: 800px;
-            height: 60vh;
+            height: 30vh;
             background: white; 
             padding: 20px; 
             border-radius: 8px; 
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); 
             position: absolute;
-           bottom: 0;
+           top: 0;
+           right: 0;
         }
         #income , #outcome { padding: 10px; 
             font-size: 16px; 
@@ -141,8 +142,7 @@
             align-items: center; 
         }
         #linearChart { 
-            width: 100% !important; 
-            height: 100% !important; 
+            
             max-height: 400px; 
         }
         .final-values { 
@@ -169,23 +169,116 @@
            
             position: absolute;
             top: 5.5%;
-            left: 10%;
+            left: 0;
+            font-size: 90%;
         }
         #CurrentStatement{
-            
+            font-size: 90%;
             position: absolute;
             top: 5.5%;
             left: 64%;
         }
         #finalOutcome {
-            font-size: 3vh;
+            font-size: 100%;
             font-weight: 900;
             color: #007BFF;
         }
         #finalIncome {
-            font-size: 3vh;
+            font-size: 100%;
             font-weight: 900;
             color: green
+        }
+        /*\\\\\\\\\\\\\\\\\\\\daylyFinancescontainer \\\\\\\\\\\\\\\\\\\\\\*/
+     
+        .left {
+            position: absolute;
+            left: 0;
+            top: 43%;
+            width: 30%;
+            border: 2px solid red;
+            padding-right: 20px;
+            border-right: 1px solid #ccc;
+        }
+        #hourlyRate{
+            position: absolute;
+            top: 20%;
+            left: 0;
+        }
+        #hoursWorked{
+            position: absolute;
+            top: 25%;
+            left: 0;
+        }
+        #dailyExpenses{
+            position: absolute;
+            top: 30%;
+            left: 0;
+        }
+        #addWorkDayButton{
+            position: absolute;
+            top: 35%;
+            left: 0;
+        }
+        #chartBar {
+            width: 50vw;
+            height: 30%;
+            margin-top: 20px;
+        }
+        .info {
+            position: absolute;
+            top: 40%;
+            left: 0; 
+            
+        }
+        #ChartBarContainer{
+            position: absolute;
+            bottom: 0;
+            left: 33%;
+            width: 50vw;
+            height: 50vh;
+            background-color: #ccc;
+        }
+        .day-list {
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .day-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 8px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+
+        .earned {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .spent {
+            background-color: #FF9800;
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .remaining {
+            background-color: #2196F3;
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                flex-direction: column;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
         }
        
 </style>
@@ -206,8 +299,31 @@
         <canvas id="linearChart"></canvas>
     </div>
 
-    
 </div>
+
+
+
+<div class="left">
+    <h2 id="title_31">Last 31 Days</h2>
+    <div class="day-list" id="dayList"></div>
+</div>
+
+        <input type="number" id="hourlyRate" placeholder="Enter your hourly rate">
+        
+        <input type="number" id="hoursWorked" placeholder="Enter hours worked today">
+        
+        <input type="number" id="dailyExpenses" placeholder="Enter today's expenses">
+        
+        <button id="addWorkDayButton">Add Work Day</button>
+        <div class="info">
+            <span>Total Earned: $<span id="totalEarned">0</span></span>
+            <span>Remaining Balance: $<span id="remainingBalance">0</span></span>
+        </div>
+        <div id="ChartBarContainer">
+            <canvas id="chartBar"></canvas>
+        </div>
+        
+    
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -782,6 +898,167 @@ let selectedExpenseIndex = null;
         BOX.linearCreateChart();
         BOX.linearUpdateChart();
 
+
+
+        function main () {
+  // Retrieve stored data from localStorage
+  let workData = JSON.parse(localStorage.getItem("workData")) || {
+            hourlyRate: 20,  // Default hourly rate if no previous data exists
+            workDays: [],
+            totalEarned: 0,
+            remainingBalance: 0
+        };
+
+        // Set the default hourly rate in the input field
+        document.getElementById("hourlyRate").value = workData.hourlyRate;
+        const tritler = document.getElementById("title_31");
+       
+
+
+
+        let total3 = 0;
+
+        workData.workDays.forEach(elem => {
+            
+            total3 += elem.hoursWorked
+    
+         });
+
+        tritler.innerText = `Total_hours_${total3}`
+
+        // Update displayed income and work details
+        function updateDisplay() {
+            document.getElementById("totalEarned").innerText = workData.totalEarned.toFixed(2);
+            document.getElementById("remainingBalance").innerText = workData.remainingBalance.toFixed(2);
+            displayWorkDays();
+            updateChart();
+        }
+
+        // Display the list of workdays (last 31 days)
+        function displayWorkDays() {
+            const dayListElement = document.getElementById("dayList");
+            dayListElement.innerHTML = ""; // Clear current list
+
+            // Show only the last 31 days
+            const last31Days = workData.workDays.slice(-31);
+            last31Days.forEach((workDay) => {
+                const dayElement = document.createElement("div");
+                dayElement.classList.add("day-item");
+
+                const dayDate = new Date(workDay.date).toLocaleDateString();
+                dayElement.innerHTML = `
+                    <span>${dayDate}</span>
+                    <span>___hours_${workDay.hoursWorked}_</span>
+                    <span class="earned">Earned: $${workDay.earnedAmount.toFixed(2)}</span>
+                    <span class="spent">Spent: $${workDay.expenses.toFixed(2)}</span>
+                    <span class="remaining">Remaining: $${workDay.remainingBalance.toFixed(2)}</span>
+                `;
+                dayListElement.appendChild(dayElement);
+            });
+        }
+
+        // Add work day to the data
+        function addWorkDay() {
+            const hourlyRate = parseFloat(document.getElementById("hourlyRate").value);
+            const hoursWorked = parseFloat(document.getElementById("hoursWorked").value);
+            const dailyExpenses = parseFloat(document.getElementById("dailyExpenses").value);
+
+            if (isNaN(hourlyRate) || isNaN(hoursWorked) || isNaN(dailyExpenses) || hourlyRate <= 0 || hoursWorked <= 0 || dailyExpenses < 0) {
+                alert("Please enter valid hourly rate, hours worked, and expenses.");
+                return;
+            }
+
+            // Store the hourly rate in localStorage for future use
+            workData.hourlyRate = hourlyRate;
+
+            const earnedAmount = hourlyRate * hoursWorked;
+            const remainingBalance = earnedAmount - dailyExpenses;
+            const today = new Date();
+
+            const workDay = {
+                date: today.toISOString(),
+                hoursWorked,
+                earnedAmount,
+                expenses: dailyExpenses,
+                remainingBalance
+            };
+
+            // Update workData
+            workData.workDays.push(workDay);
+            workData.totalEarned += earnedAmount;
+            workData.remainingBalance += remainingBalance;
+
+            // Save updated data to localStorage
+            localStorage.setItem("workData", JSON.stringify(workData));
+
+            // Clear input fields
+            document.getElementById("hourlyRate").value = "";
+            document.getElementById("hoursWorked").value = "";
+            document.getElementById("dailyExpenses").value = "";
+
+            updateDisplay();
+        }
+
+        // Update bar chart data for earnings growth
+        function updateChart() {
+            const labels = workData.workDays.slice(-31).map(workDay => new Date(workDay.date).toLocaleDateString());
+            const data = workData.workDays.slice(-31).map(workDay => workDay.remainingBalance);
+
+            const ctx = document.getElementById('chartBar').getContext('2d');
+
+
+                if (window.chartInstance) {
+                window.chartInstance.destroy(); // Destroy previous chart to prevent stacking charts
+            }
+
+            window.chartInstance = new Chart(ctx, {
+                type: 'bar', // Bar chart
+                data: {
+                    labels: labels.length ? labels : ["No data yet"],
+                    datasets: [{
+                        label: 'Remaining Balance Over Time',
+                        data: data.length ? data : [0],
+                        backgroundColor: "#4CAF50",
+                        borderColor: "#4CAF50",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return 'Remaining Balance: $' + tooltipItem.raw.toFixed(2);
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Amount ($)'
+                            },
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialize the display when the page loads
+        document.getElementById("addWorkDayButton").addEventListener("click", addWorkDay);
+        updateDisplay();
+        }
+      
+       main()
 
 
         
