@@ -73,6 +73,10 @@
             border: 1px solid #ccc;
             font-size: 16px;
         }
+        .add-expense-btn{
+            background-color: red;
+            width: 10vw;
+        }
         .popup button {
             padding: 3% 5%;
             background-color: #007BFF;
@@ -94,7 +98,7 @@
             background-color: #c82333;
         }
 
-        /*///////////////////////////////////////////////////*/
+        /*//////////////////// Linear styles///////////////////////////////*/
        
         .Linearcontainer {
             display: flex;
@@ -160,6 +164,30 @@
         .reset-button:hover { 
             background-color: darkred; 
             }
+            /*//////////////paragraphs//////////////////*/
+        #EntireStatement{
+           
+            position: absolute;
+            top: 5.5%;
+            left: 10%;
+        }
+        #CurrentStatement{
+            
+            position: absolute;
+            top: 5.5%;
+            left: 64%;
+        }
+        #finalOutcome {
+            font-size: 3vh;
+            font-weight: 900;
+            color: #007BFF;
+        }
+        #finalIncome {
+            font-size: 3vh;
+            font-weight: 900;
+            color: green
+        }
+       
 </style>
    
 <body>
@@ -168,10 +196,12 @@
   <div id="container"></div>
   <button id="setStartLinear" onclick="BOX.linearSetInitialValues()">Set Start</button>
 <div class="final-values">
-    <p><strong>Income:</strong> <span id="finalIncome">0</span> $</p>
-    <p><strong>Outcome:</strong> <span id="finalOutcome">0</span> $</p>
+    
+    
 </div>
   <div class="Linearcontainer">
+    <p id="CurrentStatement"><strong>Current Statement:</strong> <span id="finalOutcome">0</span> $</p>
+    <p id="EntireStatement"><strong>Actual Statement:</strong> <span id="finalIncome">0</span> $</p>
     <div class="chart-container">
         <canvas id="linearChart"></canvas>
     </div>
@@ -182,12 +212,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
 const startingPoint = 500;
-        const BOX = {
-        linearloadSavedData() {
-
-
-
-            const rama = {
+let scalePizzaGraph = false;
+const nameOfTheMonth = "January";
+let monthName = "January";
+const POWER = {
     "pizzaGraph": {
         "January": {"expenses": []},
         "February": {"expenses": []},
@@ -206,12 +234,20 @@ const startingPoint = 500;
         "labels": [],
         "incomeData": [],
         "outcomeData": [],
-        "cumulativeIncome": 100,
-        "cumulativeOutcome": 100
+        "cumulativeIncome": 0,
+        "cumulativeOutcome": 0,
     }
 }
+let budgetData = JSON.parse(localStorage.getItem('POWER')) || POWER;
+let selectedExpenseIndex = null;
 
-            const savedData = JSON.parse(localStorage.getItem("POWER")) || rama;
+   
+
+
+        const BOX = {
+        linearloadSavedData() {
+            
+            const savedData = JSON.parse(localStorage.getItem("POWER")) || POWER;
             if (savedData.linearGraph) {
                 labels = savedData.linearGraph.labels || [];
                 incomeData = savedData.linearGraph.incomeData || [];
@@ -227,23 +263,8 @@ const startingPoint = 500;
             }
         },
         linearSaveData() {
-            const POWER = {
-        pizzaGraph: {
-            January: { expenses: [] },
-            February: { expenses: [] },
-            March: { expenses: [] },
-            April: { expenses: [] },
-            May: { expenses: [] },
-            June: { expenses: [] },
-            July: { expenses: [] },
-            August: { expenses: [] },
-            September: { expenses: [] },
-            October: { expenses: [] },
-            November: { expenses: [] },
-            December: { expenses: [] },
-        },
-        linearGraph: {labels, incomeData, outcomeData, cumulativeIncome, cumulativeOutcome}
-    };
+    
+          POWER.linearGraph = {labels, incomeData, outcomeData, cumulativeIncome, cumulativeOutcome}
 
             let power = JSON.parse(localStorage.getItem("POWER"));
             if (power) {
@@ -270,8 +291,8 @@ const startingPoint = 500;
                 data: {
                     labels: labels,
                     datasets: [
-                        { label: 'Income', data: incomeData, borderColor: 'green', borderWidth: 3, tension: 0.4 },
-                        { label: 'Outcome', data: outcomeData, borderColor: 'red', borderWidth: 3, tension: 0.4 }
+                        { label: '', data: incomeData, borderColor: 'green', borderWidth: 3, tension: 0.4 },
+                        { label: '', data: outcomeData, borderColor: '#007BFF', borderWidth: 3, tension: 0.4 }
                     ]
                 },
                 options: {
@@ -283,49 +304,42 @@ const startingPoint = 500;
         },
         linearSetInitialValues() {
 
-
-            const rama = {
-    "pizzaGraph": {
-        "January": {"expenses": []},
-        "February": {"expenses": []},
-        "March": {"expenses": []},
-        "April": {"expenses": []},
-        "May": {"expenses": []},
-        "June": {"expenses": []},
-        "July": {"expenses": []},
-        "August": {"expenses": []}
-        ,"September": {"expenses": []},
-        "October": {"expenses": []},
-        "November": {"expenses": []},
-        "December": {"expenses": []}
-    },
-    "linearGraph": {
-        "labels": [],
-        "incomeData": [],
-        "outcomeData": [],
-        "cumulativeIncome": 100,
-        "cumulativeOutcome": 100
-    }
-}
-
             labels = [this.linearGetCurrentDate()];
             incomeData = [startingPoint];
             outcomeData = [startingPoint];
-            const power = JSON.parse(localStorage.getItem("POWER")) || rama;
+            const power = JSON.parse(localStorage.getItem("POWER")) || POWER;
             const a = power.linearGraph.income;
+            const b = power.pizzaGraph[monthName].expenses
+            b.length = 0;
+            console.log(b)
             power.linearGraph.cumulativeIncome = startingPoint;
             power.linearGraph.cumulativeOutcome = startingPoint;
             localStorage.setItem("POWER" , JSON.stringify(power));
             cumulativeIncome = startingPoint;
             cumulativeOutcome = startingPoint;
             this.linearUpdateChart();
+            this.pizzaUpdateChart();
+            
             this.linearSaveData();
+            const unex = JSON.parse(localStorage.getItem("POWER")) || POWER;
+        const totalt = unex.pizzaGraph[monthName].expenses
+        let countExpectAmount = 0;
+        let countUnexpectAmount = 0;
+        let countTotalAmount = 0;
+        totalt.forEach(element => {
+          countExpectAmount += element.expectedAmount;
+          countUnexpectAmount += element.unexpectedAmount;
+          countTotalAmount += element.amount
+        });
+        const UnexParagraph = document.getElementById("unexpected1");
+        UnexParagraph.innerText = `Expected ${countExpectAmount} Unexpected ${countUnexpectAmount || 0} Total ${countTotalAmount}`;
         },
-        linearUpdateGraph( first , second) {
-
-
-            cumulativeIncome += first;
-            cumulativeOutcome -= second;
+        linearUpdateGraph( first , second , third) {
+ 
+            const actuallMoney = (first + second + third) || 0;
+            
+            cumulativeIncome += actuallMoney;
+            cumulativeOutcome += second + third;
 
             labels.push(BOX.linearGetCurrentDate());
             incomeData.push(cumulativeIncome);
@@ -343,74 +357,40 @@ const startingPoint = 500;
             document.getElementById('finalIncome').textContent = cumulativeIncome.toFixed(2);
             document.getElementById('finalOutcome').textContent = cumulativeOutcome.toFixed(2);
         },
-}
+        pizzaUpdateChart() {
+            const total = budgetData.pizzaGraph[monthName].expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const labels = budgetData.pizzaGraph[monthName].expenses.map(expense => `${expense.category}: $${expense.amount} (${((expense.amount / total) * 100).toFixed(2)}%)`);
+            const amounts = budgetData.pizzaGraph[monthName].expenses.map(expense => expense.amount);
+            const ctx = document.getElementById('chart').getContext('2d');
 
+            if (window.myChart) window.myChart.destroy();
 
-
-  
-
-
-
-function mainFunction(the_name) {
-    const monthName = the_name;
-
-    const POWER = {
-        pizzaGraph: {
-            January: { expenses: [] },
-            February: { expenses: [] },
-            March: { expenses: [] },
-            April: { expenses: [] },
-            May: { expenses: [] },
-            June: { expenses: [] },
-            July: { expenses: [] },
-            August: { expenses: [] },
-            September: { expenses: [] },
-            October: { expenses: [] },
-            November: { expenses: [] },
-            December: { expenses: [] },
-        },
-        unexpectedExpence: 0,
-    };
-
-    let budgetData = JSON.parse(localStorage.getItem('POWER')) || POWER;
-    let selectedExpenseIndex = null;
-
-    function updateChart() {
-        const total = budgetData.pizzaGraph[monthName].expenses.reduce((sum, expense) => sum + expense.amount, 0);
-        const labels = budgetData.pizzaGraph[monthName].expenses.map(expense => `${expense.category}: $${expense.amount} (${((expense.amount / total) * 100).toFixed(2)}%)`);
-        const amounts = budgetData.pizzaGraph[monthName].expenses.map(expense => expense.amount);
-        const ctx = document.getElementById('chart').getContext('2d');
-
-        if (window.myChart) window.myChart.destroy();
-
-        window.myChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labels.length ? labels : ["No expenses yet"],
-                datasets: [{
-                    label: 'Expenses',
-                    data: amounts.length ? amounts : [1],
-                    backgroundColor: ["#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#FFD700" , "#4083cb" , "#cb9340" , "#8ccb40" , "#cb4098" , "#40bfcb"],
-                }]
-            },
-            options: {
-                responsive: true,
-                onClick: (event, elements) => {
-                    if (elements.length) {
-                        selectedExpenseIndex = elements[0].index;
-                        document.getElementById(`popup_${monthName}`).style.display = 'block';
+            window.myChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels.length ? labels : ["No expenses yet"],
+                    datasets: [{
+                        label: 'Expenses',
+                        data: amounts.length ? amounts : [1],
+                        backgroundColor: ["#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#FFD700" , "#4083cb" , "#cb9340" , "#8ccb40" , "#cb4098" , "#40bfcb"],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    onClick: (event, elements) => {
+                        if (elements.length) {
+                            selectedExpenseIndex = elements[0].index;
+                            document.getElementById(`popup_${monthName}`).style.display = 'block';
+                        }
                     }
                 }
-            }
-        });
-    }
-
-    let scalePizzaGraph = false;
-    function createElements() {
+            });
+    },
+        pizzaCreateElements() {
         const container = document.querySelector('body');
         const divContainer = document.createElement('div');
         divContainer.classList.add('container');
-        divContainer.ondblclick = scale_theGraph;
+        divContainer.ondblclick = BOX.pizzaScale_theGraph;
         divContainer.id = `container_${monthName}`;
         container.appendChild(divContainer);
 
@@ -435,13 +415,13 @@ function mainFunction(the_name) {
         addExpenseBtn.classList.add('add-expense-btn');
         addExpenseBtn.id = `addExpenseBtn_${monthName}`;
         addExpenseBtn.textContent = monthName;
-        addExpenseBtn.onclick = openAddExpensePopup;
+        addExpenseBtn.onclick = BOX.pizzaOpenAddExpensePopup;
         document.body.appendChild(addExpenseBtn);
 
         const expensesPopupBtn = document.createElement('button');
         expensesPopupBtn.classList.add('expenses-popup-btn');
         expensesPopupBtn.textContent = "Expenses";
-        expensesPopupBtn.onclick = openExpensesPopup;
+        expensesPopupBtn.onclick = BOX.pizzaOpenExpensesPopup;
         document.body.appendChild(expensesPopupBtn);
 
         const canvas = document.createElement('canvas');
@@ -467,18 +447,18 @@ function mainFunction(the_name) {
         expenseAmountInput.id = 'expenseAmount';
         expenseAmountInput.id = `expenseAmount_${monthName}`;
         expenseAmountInput.type = 'number';
-        expenseAmountInput.placeholder = 'Amount';
+        expenseAmountInput.placeholder = 'Bank Account changes (0) required';
         addExpensePopup.appendChild(expenseAmountInput);
 
         // New input fields
         const input1 = document.createElement('input');
-        input1.placeholder = 'Input1';
+        input1.placeholder = 'Income';
         input1.id = "addInput1";
         input1.type = "number";
         addExpensePopup.appendChild(input1);
 
         const input2 = document.createElement('input');
-        input2.placeholder = 'Input2';
+        input2.placeholder = 'Hours';
         input2.id = "addInput2";
         input2.type = "number";
         addExpensePopup.appendChild(input2);
@@ -486,20 +466,20 @@ function mainFunction(the_name) {
         const addBtn = document.createElement('button');
         addBtn.textContent = 'Add Expected';
         addBtn.id = `add_${monthName}`;
-        addBtn.onclick = addExpense;
+        addBtn.onclick =BOX.pizzaAddExpense;
         addExpensePopup.appendChild(addBtn);
 
         const unnBtn = document.createElement('button');
         unnBtn.textContent = 'Add Unexpected';
         unnBtn.id = `add_${monthName}`;
-        unnBtn.onclick = addunexpectedExpense;
+        unnBtn.onclick = BOX.pizzaAddunexpectedExpense;
         addExpensePopup.appendChild(unnBtn);
 
         const cancelAddBtn = document.createElement('button');
         cancelAddBtn.classList.add('cancel-btn');
         cancelAddBtn.textContent = 'Cancel';
         cancelAddBtn.id = `cancel_${monthName}`;
-        cancelAddBtn.onclick = closeAddExpensePopup;
+        cancelAddBtn.onclick = BOX.pizzaCloseAddExpensePopup;
         addExpensePopup.appendChild(cancelAddBtn);
 
         // New Expenses Popup
@@ -522,53 +502,52 @@ function mainFunction(the_name) {
         popup.appendChild(popupTitle);
 
         const updateAmountInput = document.createElement('input');
-        updateAmountInput.id = 'updateAmount';
+        
         updateAmountInput.id = `updateAmount_${monthName}`;
         updateAmountInput.type = 'number';
-        updateAmountInput.placeholder = 'Enter new amount or additional amount';
+        updateAmountInput.placeholder = 'Banck Account Changes';
         popup.appendChild(updateAmountInput);
 
         // New input fields
         const input1Update = document.createElement('input');
-        input1Update.placeholder = 'Input1';
+        input1Update.placeholder = 'Income';
         input1Update.id = "updateInput1"
         input1Update.type = "number";
         popup.appendChild(input1Update);
 
         const input2Update = document.createElement('input');
-        input2Update.placeholder = 'Input2';
+        input2Update.placeholder = 'Hours';
         input2Update.id = "updateInput2"
         input2Update.type = "number";
         popup.appendChild(input2Update);
 
         const updateBtn = document.createElement('button');
         updateBtn.textContent = 'Update Expected';
-        updateBtn.onclick = updateExpense;
+        updateBtn.onclick = BOX.pizzaUpdateExpense;
         updateBtn.id = `updateBtn_${monthName}`;
         popup.appendChild(updateBtn);
 
         // Add "Unexpected" button to the Update Popup
         const unexpectedBtn = document.createElement('button');
         unexpectedBtn.textContent = 'Update Unexpected';
-        unexpectedBtn.onclick = unexpectedFunction;
+        unexpectedBtn.onclick = BOX.pizzaUnexpectedFunction;
         popup.appendChild(unexpectedBtn);
 
         const deleteBtn = document.createElement('button');
         deleteBtn.classList.add('cancel-btn');
         deleteBtn.textContent = 'Delete';
         deleteBtn.id = `Delete_${monthName}`;
-        deleteBtn.onclick = deleteExpense;
+        deleteBtn.onclick = BOX.pizzaDeleteExpense;
         popup.appendChild(deleteBtn);
 
         const cancelBtn = document.createElement('button');
         cancelBtn.classList.add('cancel-btn');
         cancelBtn.textContent = 'Cancel';
         cancelBtn.id = `Cancel__${monthName}`;
-        cancelBtn.onclick = closePopup;
+        cancelBtn.onclick =BOX.pizzaClosePopup;
         popup.appendChild(cancelBtn);
-    }
-
-    function scale_theGraph() {
+    },
+        pizzaScale_theGraph() {
         const a = document.getElementById(`container_${monthName}`);
         if (scalePizzaGraph) {
             a.style.height = "40vh";
@@ -583,9 +562,8 @@ function mainFunction(the_name) {
             a.style.bottom = "0";
             scalePizzaGraph = !scalePizzaGraph;
         }
-    }
-
-    function openExpensesPopup() {
+    },
+        pizzaOpenExpensesPopup() {
         const expensesPopup = document.getElementById(`expensesPopup_${monthName}`);
         expensesPopup.innerHTML = '<h3>Expenses List</h3>';  // Clear previous buttons
         
@@ -596,139 +574,56 @@ function mainFunction(the_name) {
             expenses.forEach((expense, index) => {
                 const expenseBtn = document.createElement('button');
                 expenseBtn.textContent = expense.category;
-                expenseBtn.onclick = () => openExpenseUpdatePopup(index);
+                expenseBtn.onclick = () => BOX.pizzaOpenExpenseUpdatePopup(index);
                 expensesPopup.appendChild(expenseBtn);
             });
         }
         expensesPopup.style.display = 'block';
-    }
-
-    function closeExpensesPopup() {
+    },
+        pizzaCloseExpensesPopup() {
         document.getElementById(`expensesPopup_${monthName}`).style.display = 'none';
-    }
-
-    function openExpenseUpdatePopup(index) {
+        },
+        pizzaOpenExpenseUpdatePopup(index) {
         selectedExpenseIndex = index;
         const expense = budgetData.pizzaGraph[monthName].expenses[selectedExpenseIndex];
         const updateAmountInput = document.getElementById(`updateAmount_${monthName}`);
         updateAmountInput.value = expense.amount; // Set current amount
         
         document.getElementById(`popup_${monthName}`).style.display = 'block';
-    }
-    function updateExpense() {
-    const additionalAmount = parseFloat(document.getElementById(`updateAmount_${monthName}`).value);
-    const input1Element = document.getElementById("updateInput1");
-    const input2Element = document.getElementById("updateInput2");
-
+    },
+        pizzaUpdateExpense() {
+    const additionalAmount = parseFloat(document.getElementById(`updateAmount_${monthName}`).value) || 0;
+    const input1Element = document.getElementById("updateInput1") || 0;
+    const input2Element = document.getElementById("updateInput2") || 0;
+    
     const input1Value = input1Element.value.trim() === "" ? 0 : parseFloat(input1Element.value);
     const input2Value = input2Element.value.trim() === "" ? 0 : parseFloat(input2Element.value);
 
     // Log the processed values
 
     // Now proceed with the expense update logic
-    if (!isNaN(additionalAmount) && additionalAmount > 0 && selectedExpenseIndex !== null) {
+    if (!isNaN(additionalAmount) && additionalAmount < 0 && selectedExpenseIndex !== null) {
         // Add the new amount and update the expected amount
         budgetData.pizzaGraph[monthName].expenses[selectedExpenseIndex].amount += additionalAmount;
         budgetData.pizzaGraph[monthName].expenses[selectedExpenseIndex].expectedAmount += additionalAmount;
         localStorage.setItem('POWER', JSON.stringify(budgetData));
-        BOX.linearUpdateGraph(input1Value , input2Value)
+        BOX.linearUpdateGraph(input2Value , additionalAmount , input1Value );
+       
 
         // You can now do something with input1Value and input2Value if needed:
         // For example, save them to the expense item or perform any other logic here.
 
         // Update the chart and close the popup
-        updateChart();
-        closePopup();
+       BOX.pizzaUpdateChart();
+       BOX.pizzaClosePopup();
+       BOX.pizzaCloseAddExpensePopup()
     } else {
-        alert("Please enter a valid amount.");
+        BOX.linearUpdateGraph(input2Value , additionalAmount , input1Value );
+       
+        BOX.pizzaClosePopup();
+        BOX.pizzaCloseAddExpensePopup()
     }
-
-    // Clear the input field
-    clearInputField();
-}
-
-    function deleteExpense() {
-        if (selectedExpenseIndex !== null) {
-            budgetData.pizzaGraph[monthName].expenses.splice(selectedExpenseIndex, 1);
-            localStorage.setItem('POWER', JSON.stringify(budgetData));
-            updateChart();
-            closePopup();
-        }
-        clearInputField();
-    }
-     
-    function add_income(inc , hours) {
-     console.log(`The income is : ${inc}`);
-     console.log(`The hours are : ${hours}`);
-     console.log(inc)
-     BOX.linearUpdateGraph(inc , hours)
-    }
-    // "Unexpected" button functionality
-    function unexpectedFunction() {
-    const input1Element = document.getElementById("updateInput1");
-    const input2Element = document.getElementById("updateInput2");
-
-    const input1Value = input1Element.value.trim() === "" ? 0 : parseFloat(input1Element.value);
-    const input2Value = input2Element.value.trim() === "" ? 0 : parseFloat(input2Element.value);
-
-    // Log the processed values
-    
-
-        const additionalAmount = parseFloat(document.getElementById(`updateAmount_${monthName}`).value);
-        if (!isNaN(additionalAmount) && additionalAmount > 0 && selectedExpenseIndex !== null) {
-            budgetData.pizzaGraph[monthName].expenses[selectedExpenseIndex].amount += additionalAmount;
-            budgetData.pizzaGraph[monthName].expenses[selectedExpenseIndex].unexpectedAmount += additionalAmount;
-            localStorage.setItem('POWER', JSON.stringify(budgetData));
-            BOX.linearUpdateGraph(input1Value , additionalAmount)
-            updateChart();
-            closePopup();
-        } else {
-            alert("Please enter a valid amount.");
-        }
-        clearInputField();
-    }
-
-    function closePopup() {
-        document.getElementById(`popup_${monthName}`).style.display = 'none';
-    }
-
-    function openAddExpensePopup() {
-        document.getElementById(`addExpensePopup_${monthName}`).style.display = 'block';
-    }
-
-    function closeAddExpensePopup() {
-        document.getElementById(`addExpensePopup_${monthName}`).style.display = 'none';
-    }
-
-    function addExpense() {
-    const input1Element = document.getElementById("addInput1");
-    const input2Element = document.getElementById("addInput2");
-
-    const input1Value = input1Element.value.trim() === "" ? 0 : parseFloat(input1Element.value);
-    const input2Value = input2Element.value.trim() === "" ? 0 : parseFloat(input2Element.value);
-
-    // Log the processed values
-
-        const name = document.getElementById(`expenceName_${monthName}`).value;
-        const amount = parseFloat(document.getElementById(`expenseAmount_${monthName}`).value);
-        if (name && !isNaN(amount) && amount > 0) {
-            budgetData.pizzaGraph[monthName].expenses.push({ category: name, amount: amount ,  expectedAmount: amount , unexpectedAmount: 0 });
-            localStorage.setItem('POWER', JSON.stringify(budgetData));
-            updateChart();
-            closeAddExpensePopup();
-        } else {
-            alert("Please enter a valid name and amount.");
-        }
-        clearInputField();
-        
-        const unex = JSON.parse(localStorage.getItem("POWER")) || POWER;
-
-
-        BOX.linearUpdateGraph(input1Value , amount)
-
-
-
-
+    const unex = JSON.parse(localStorage.getItem("POWER")) || POWER;
         const totalt = unex.pizzaGraph[monthName].expenses
         let countExpectAmount = 0;
         let countUnexpectAmount = 0;
@@ -740,11 +635,102 @@ function mainFunction(the_name) {
         });
         const UnexParagraph = document.getElementById("unexpected1");
         UnexParagraph.innerText = `Expected ${countExpectAmount} Unexpected ${countUnexpectAmount || 0} Total ${countTotalAmount}`;
-    }
+},
+        pizzaDeleteExpense() {
+        if (selectedExpenseIndex !== null) {
+            budgetData.pizzaGraph[monthName].expenses.splice(selectedExpenseIndex, 1);
+            localStorage.setItem('POWER', JSON.stringify(budgetData));
+           BOX.pizzaUpdateChart();
+           BOX.pizzaClosePopup();
+        }
+        
+    },
+        pizzaUnexpectedFunction() {
+    const input1Element = document.getElementById("updateInput1") || 0;
+    const input2Element = document.getElementById("updateInput2") || 0;
 
-    function addunexpectedExpense() {
-        const input1Element = document.getElementById("addInput1");
-        const input2Element = document.getElementById("addInput2");
+    const input1Value = input1Element.value.trim() === "" ? 0 : parseFloat(input1Element.value);
+    const input2Value = input2Element.value.trim() === "" ? 0 : parseFloat(input2Element.value);
+
+    // Log the processed values
+    
+
+        const additionalAmount = parseFloat(document.getElementById(`updateAmount_${monthName}`).value) || 0;
+        if (!isNaN(additionalAmount) && additionalAmount < 0 && selectedExpenseIndex !== null) {
+            budgetData.pizzaGraph[monthName].expenses[selectedExpenseIndex].amount += additionalAmount;
+            budgetData.pizzaGraph[monthName].expenses[selectedExpenseIndex].unexpectedAmount += additionalAmount;
+            localStorage.setItem('POWER', JSON.stringify(budgetData));
+            BOX.linearUpdateGraph(input2Value , additionalAmount , input1Value );
+           BOX.pizzaUpdateChart();
+           BOX.pizzaClosePopup();
+           BOX.pizzaCloseAddExpensePopup()
+        } else {
+            BOX.linearUpdateGraph(input2Value , additionalAmount , input1Value );
+            BOX.pizzaUpdateChart();
+            BOX.pizzaClosePopup();
+            BOX.pizzaCloseAddExpensePopup()
+        }
+        const unex = JSON.parse(localStorage.getItem("POWER")) || POWER;
+        const totalt = unex.pizzaGraph[monthName].expenses
+        let countExpectAmount = 0;
+        let countUnexpectAmount = 0;
+        let countTotalAmount = 0;
+        totalt.forEach(element => {
+          countExpectAmount += element.expectedAmount;
+          countUnexpectAmount += element.unexpectedAmount;
+          countTotalAmount += element.amount
+        });
+        const UnexParagraph = document.getElementById("unexpected1");
+        UnexParagraph.innerText = `Expected ${countExpectAmount} Unexpected ${countUnexpectAmount || 0} Total ${countTotalAmount}`;
+    },
+        pizzaClosePopup() {
+        document.getElementById(`popup_${monthName}`).style.display = 'none';
+    },
+        pizzaOpenAddExpensePopup() {
+        document.getElementById(`addExpensePopup_${monthName}`).style.display = 'block';
+    },
+        pizzaCloseAddExpensePopup() {
+        document.getElementById(`addExpensePopup_${monthName}`).style.display = 'none';
+    },
+        pizzaAddExpense() {
+    const input1Element = document.getElementById("addInput1");
+    const input2Element = document.getElementById("addInput2");
+    const incomeThatRises = input2Element.value || 0;
+
+    const input1Value = input1Element.value.trim() === "" ? 0 : parseFloat(input1Element.value);
+    const input2Value = input2Element.value.trim() === "" ? 0 : parseFloat(input2Element.value);
+
+    // Log the processed values
+
+        const name = document.getElementById(`expenceName_${monthName}`).value;
+        const amount = parseFloat(document.getElementById(`expenseAmount_${monthName}`).value) || 0;
+        if (name && !isNaN(amount) && amount < 0) {
+            budgetData.pizzaGraph[monthName].expenses.push({ category: name, amount: amount ,  expectedAmount: amount , unexpectedAmount: 0 });
+            localStorage.setItem('POWER', JSON.stringify(budgetData));
+            BOX.linearUpdateGraph(input2Value , amount , input1Value )
+           BOX.pizzaUpdateChart();;
+           BOX.pizzaCloseAddExpensePopup();
+        } else {
+            BOX.linearUpdateGraph(input2Value , amount , input1Value );
+            BOX.pizzaCloseAddExpensePopup();
+        }
+        
+        const unex = JSON.parse(localStorage.getItem("POWER")) || POWER;
+        const totalt = unex.pizzaGraph[monthName].expenses
+        let countExpectAmount = 0;
+        let countUnexpectAmount = 0;
+        let countTotalAmount = 0;
+        totalt.forEach(element => {
+          countExpectAmount += element.expectedAmount;
+          countUnexpectAmount += element.unexpectedAmount;
+          countTotalAmount += element.amount
+        });
+        const UnexParagraph = document.getElementById("unexpected1");
+        UnexParagraph.innerText = `Expected ${countExpectAmount} Unexpected ${countUnexpectAmount || 0} Total ${countTotalAmount}`;
+    },
+        pizzaAddunexpectedExpense() {
+        const input1Element = document.getElementById("addInput1") || 0;
+        const input2Element = document.getElementById("addInput2") || 0;
 
         const input1Value = input1Element.value.trim() === "" ? 0 : parseFloat(input1Element.value);
         const input2Value = input2Element.value.trim() === "" ? 0 : parseFloat(input2Element.value);
@@ -753,19 +739,19 @@ function mainFunction(the_name) {
         
 
         const name = document.getElementById(`expenceName_${monthName}`).value;
-        const amount = parseFloat(document.getElementById(`expenseAmount_${monthName}`).value);
-        if (name && !isNaN(amount) && amount > 0) {
+        const amount = parseFloat(document.getElementById(`expenseAmount_${monthName}`).value) || 0;
+        if (name && !isNaN(amount) && amount < 0) {
             budgetData.pizzaGraph[monthName].expenses.push({ category: name, amount: amount ,  expectedAmount: 0 , unexpectedAmount: amount });
             localStorage.setItem('POWER', JSON.stringify(budgetData));
-            updateChart();
-            closeAddExpensePopup();
+            BOX.pizzaUpdateChart();;
+           BOX.pizzaCloseAddExpensePopup();
         } else {
-            alert("Please enter a valid name and amount.");
+            BOX.linearUpdateGraph(input2Value , amount , input1Value );
+            BOX.pizzaCloseAddExpensePopup();
         }
-        clearInputField();
         
         const unex = JSON.parse(localStorage.getItem("POWER")) || POWER;
-        BOX.linearUpdateGraph(input1Value , amount)
+        BOX.linearUpdateGraph(input2Value , amount , input1Value );
         const totalt = unex.pizzaGraph[monthName].expenses
         let countExpectAmount = 0;
         let countUnexpectAmount = 0;
@@ -777,29 +763,15 @@ function mainFunction(the_name) {
         });
         const UnexParagraph = document.getElementById("unexpected1");
         UnexParagraph.innerText = `Expected ${countExpectAmount} Unexpected ${countUnexpectAmount || 0} Total ${countTotalAmount}`;
-    }
+    },
 
-    function clearInputField() {
-        document.getElementById(`updateAmount_${monthName}`).value = '';
-    }
 
-    // Initialize the page by creating the elements dynamically
-    createElements();
-
-    // Update the chart initially
-    updateChart();
 }
-mainFunction("May")
 
 
 
-
-
-
-
-
-
-
+        BOX.pizzaCreateElements();
+        BOX.pizzaUpdateChart();
 
 
         const ctx = document.getElementById('linearChart').getContext('2d');
@@ -858,11 +830,13 @@ function monthButtons() {
               const b = document.getElementById("unexpected1");
               const c = document.querySelector('.add-expense-btn')
               const d = document.querySelector('.expenses-popup-btn')
+              monthName = month
               b.remove();
               a.remove();
               c.remove();
               d.remove();
-              mainFunction(month)
+              BOX.pizzaCreateElements();
+              BOX.pizzaUpdateChart();
             });
 
             container.appendChild(button);
