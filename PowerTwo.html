@@ -320,7 +320,11 @@
             font-size: 20px;
             
         }
-       
+       #motMaching{
+        position: absolute;
+        top: 2vh;
+        left: 50vw;
+       }
 </style>
    
 <body>
@@ -383,6 +387,8 @@
             <p id="totalEUR">Total in EUR: </p>
             <p id="totalUSD">Total in USD: </p>
         </div>
+
+        <p id="motMaching">difference: 0</p>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
@@ -605,8 +611,6 @@ let selectedExpenseIndex = null;
 
             document.getElementById('finalIncome').textContent = cumulativeIncome.toFixed(2);
             document.getElementById('finalOutcome').textContent = cumulativeOutcome.toFixed(2);
-
-
             
         },
         pizzaUpdateChart() {
@@ -1032,6 +1036,10 @@ let selectedExpenseIndex = null;
             document.getElementById("remainingBalance").innerText = workData.remainingBalance.toFixed(2);
            BOX.barDisplayWorkDays();
            BOX.barUpdateChart();
+           
+        
+          
+           
         },
         barDisplayWorkDays() {
             const dayListElement = document.getElementById("dayList");
@@ -1083,7 +1091,7 @@ let selectedExpenseIndex = null;
                     previousMonthHours += workDay.hoursWorked
                 }
                 
-
+              
               
                 
             });
@@ -1111,7 +1119,7 @@ let selectedExpenseIndex = null;
              document.getElementById("MonthHours").innerText =
               `Previous Month hours: ${previousMonthHours}
                Current Month hurs: ${currentMonthHours}`
-            
+              
             const workDay = {
                 date: today.toISOString(),
                 hoursWorked,
@@ -1309,6 +1317,28 @@ let selectedExpenseIndex = null;
             document.getElementById("totalEUR").innerText = "Total in EUR: " + (totalUSD * rateEUR).toFixed(2);
             document.getElementById("totalUSD").innerText = "Total in USD: " + totalUSD.toFixed(2);
            BOX.currencySaveData();
+           const balance = Number((totalUSD * ratePLN).toFixed(2))
+
+
+
+           const abba = (myChart.data.datasets[1].data[myChart.data.datasets[1].data.length - 1]);
+           const stalll = Math.round(abba - balance) || 3333;
+
+           if (Math.round(abba - balance) > 0) {
+            
+            document.getElementById("motMaching").innerText = `Difference: ${Math.round(abba - balance)}
+             set an expence and then
+             add to the bank account`
+           } else if(Math.round(abba - balance) < 0) {
+           document.getElementById("motMaching").innerText = `Difference: ${Math.round(abba - balance)}
+             set an income and then
+             subtract it from the banckaccount`
+           }else{
+            document.getElementById("motMaching").innerText = `Difference: ${Math.round(abba - balance)}`
+           }
+
+           
+           
         },
 
 
@@ -1344,6 +1374,87 @@ let selectedExpenseIndex = null;
      Current Month hurs: ${currentMonthHours}`
      
      
+
+
+
+     function daysBetween(date1, date2) {
+                // Convert both date strings to Date objects
+                let d1 = new Date(date1);
+                let d2 = new Date(date2);
+
+                // Calculate the difference in milliseconds
+                let diffTime = Math.abs(d2 - d1);
+
+                // Convert milliseconds to days
+                return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            }
+                // const sss = workData.workDays[0].date || "2025-02-03T14:35:15.607Z"
+                let sss = "2025-01-01T14:35:15.607Z"
+                if (workData.workDays.length !== 0) {
+                    sss = workData.workDays[0].date
+                }
+                const unex = JSON.parse(localStorage.getItem("POWER")) || POWER; 
+                const totalt = unex.pizzaGraph[monthName].expenses
+                let countTotalAmount = 0;
+                totalt.forEach(element => {
+                    countTotalAmount += element.amount
+                    });
+                
+           // Example usage
+
+           console.log(`days from the first expence untill now: ${daysBetween(sss, new Date().toISOString())}`)
+           // Output: 30
+           console.log(`TotalSpent this time: ${-countTotalAmount}` )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+           function averageMonthlySpending(days, totalSpent) {
+    const daysInMonth = 30.4375; // Average days in a month (365.25 / 12)
+    
+    // Calculate the daily spending rate
+    let dailySpending = totalSpent / days;
+    
+    // Estimate the monthly spending
+    let monthlySpending = dailySpending * daysInMonth;
+    
+    return monthlySpending.toFixed(2); // Return result rounded to 2 decimal places
+}
+
+// Example usage
+console.log(averageMonthlySpending(daysBetween(sss, new Date().toISOString()), -countTotalAmount)); // Output: Estimated monthly spending
+
+   
+
+ 
+
+
+
+
+
 
 
     </script>
