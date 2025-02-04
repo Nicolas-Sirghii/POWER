@@ -480,10 +480,7 @@ let selectedExpenseIndex = null;
       // Retrieve stored data from localStorage
       
       let workData = budgetData.workData
-      window.onload = function() {
-          BOX.currencyLoadData();
-          BOX.currencyCalculateTotal();
-        };
+     
 
         // Set the default hourly rate in the input field
         
@@ -598,6 +595,20 @@ let selectedExpenseIndex = null;
         "totalEarned": 0,
         "remainingBalance": 0
     }
+        budgetData.currencyData = {
+        "balancePLN": document.getElementById("balancePLN").value,
+        "balanceMDL": document.getElementById("balanceMDL").value,
+        "balanceEUR": document.getElementById("balanceEUR").value,
+        "balanceUSD": document.getElementById("balanceUSD").value,
+        "ratePLN": document.getElementById("ratePLN").value,
+        "rateMDL": document.getElementById("rateMDL").value,
+        "rateEUR": document.getElementById("rateEUR").value,
+    }
+
+
+
+
+
         localStorage.setItem( "POWER",JSON.stringify(budgetData));
         localStorage.setItem( monthName , JSON.stringify(budgetData));
        
@@ -624,6 +635,8 @@ let selectedExpenseIndex = null;
 
         const UnexParagraph = document.getElementById("unexpected1");
         UnexParagraph.innerText = `Expected ${countExpectAmount} Unexpected ${countUnexpectAmount || 0} Total ${countTotalAmount}`;
+
+        console.log(budgetData)
         },
         linearUpdateGraph( first , second , third) {
        
@@ -662,7 +675,7 @@ let selectedExpenseIndex = null;
 
 
             
-            BOX.currencyCalculateTotal()
+            
 
 
             
@@ -684,6 +697,7 @@ let selectedExpenseIndex = null;
 
             BOX.linearUpdateChart();
             BOX.linearSaveData();
+          
         },
         linearUpdateChart() {
             myChart.data.labels = labels;
@@ -1375,7 +1389,7 @@ let selectedExpenseIndex = null;
         updateMonth();
         
       },
-      currencyCalculateTotal() {
+        currencyCalculateTotal() {
             let balancePLN = parseFloat(document.getElementById("balancePLN").value) || 0;
             let balanceMDL = parseFloat(document.getElementById("balanceMDL").value) || 0;
             let balanceEUR = parseFloat(document.getElementById("balanceEUR").value) || 0;
@@ -1558,7 +1572,10 @@ calculateSustainability(AverageMoneySpent, go);
 }
 
 
-
+window.onload = function() {
+          BOX.currencyLoadData();
+          BOX.currencyCalculateTotal();
+        };
 
 
         BOX.pizzaCreateElements();
