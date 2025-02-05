@@ -199,11 +199,7 @@
             padding-right: 20px;
             border-right: 1px solid #ccc;
         }
-        #hourlyRate{
-            position: absolute;
-            top: 20%;
-            left: 0;
-        }
+        
         #addWorkDayButton{
             position: absolute;
             top: 35%;
@@ -324,6 +320,23 @@
         top: 45vh;
         left: 50vw;
        }
+       .Balance{
+        
+        border: none;
+        font-size: 100%;
+        font-weight: 900;
+       
+        width: 8vw;
+        background-color: transparent;
+       }
+       .RateInput{
+        border: none;
+        font-size: 100%;
+        font-weight: 900;
+        color: #6735dc;
+        width: 8vw;
+        background-color: transparent;
+       }
 </style>
    
 <body>
@@ -351,7 +364,6 @@
     <div class="day-list" id="dayList"></div>
 </div>
 
-        <input type="number" id="hourlyRate" placeholder="Enter your hourly rate">
         
         
         
@@ -371,13 +383,13 @@
 
 
         <div id="currenciCalculator">
-            <label>Balance in PLN: <input type="number" id="balancePLN" oninput="BOX.currencyCalculateTotal()"></label><br>
-            <label>Exchange Rate PLN/USD: <input type="number" step="0.01" id="ratePLN" oninput="BOX.currencyCalculateTotal()"></label><br>
-            <label>Balance in MDL: <input type="number" id="balanceMDL" oninput="BOX.currencyCalculateTotal()"></label><br>
-            <label>Exchange Rate MDL/USD: <input type="number" step="0.01" id="rateMDL" oninput="BOX.currencyCalculateTotal()"></label><br>
-            <label>Balance in EUR: <input type="number" id="balanceEUR" oninput="BOX.currencyCalculateTotal()"></label><br>
-            <label>Exchange Rate EUR/USD: <input type="number" step="0.01" id="rateEUR" oninput="BOX.currencyCalculateTotal()"></label><br>
-            <label>Balance in USD: <input type="number" id="balanceUSD" oninput="BOX.currencyCalculateTotal()"></label><br><br>
+            <label>Balance in PLN: <input class="Balance" type="number" id="balancePLN" oninput="BOX.currencyCalculateTotal()"></label><br>
+            <label>Exchange Rate PLN/USD: <input class="RateInput" type="number" step="0.01" id="ratePLN" oninput="BOX.currencyCalculateTotal()"></label><br>
+            <label>Balance in MDL: <input class="Balance" type="number" id="balanceMDL" oninput="BOX.currencyCalculateTotal()"></label><br>
+            <label>Exchange Rate MDL/USD: <input class="RateInput" type="number" step="0.01" id="rateMDL" oninput="BOX.currencyCalculateTotal()"></label><br>
+            <label>Balance in EUR: <input class="Balance" type="number" id="balanceEUR" oninput="BOX.currencyCalculateTotal()"></label><br>
+            <label>Exchange Rate EUR/USD: <input class="RateInput" type="number" step="0.01" id="rateEUR" oninput="BOX.currencyCalculateTotal()"></label><br>
+            <label>Balance in USD: <input class="Balance" type="number" id="balanceUSD" oninput="BOX.currencyCalculateTotal()"></label><br><br>
             <p id="totalPLN">Total in PLN: </p>
             <p id="totalMDL">Total in MDL: </p>
             <p id="totalEUR">Total in EUR: </p>
@@ -395,6 +407,7 @@ let previousMonthHours = 0;
 let currentMonthHours = 0;
 let MoneyLastMonth = 0;
 let MoneyThisMonth = 0;
+let graphsCoincidence = false;
        
 
     const curMonth = new Date().getMonth() + 1; // Get month (1-12)
@@ -484,7 +497,7 @@ let selectedExpenseIndex = null;
 
         // Set the default hourly rate in the input field
         
-        document.getElementById("hourlyRate").value = workData.hourlyRate;
+        
         const tritler = document.getElementById("title_31");
         let total3 = 0;
 
@@ -676,15 +689,25 @@ let selectedExpenseIndex = null;
 
             
             
-
-
+           console.log("LinearGrap")
+           console.log(workData.workDays)
             
            // make it check the today's date So it will not add new day 2 times.
            const today = new Date();
-           const last_day_date = 
+           let last_day_date = 
            workData.workDays.length !== 0 ?
            workData.workDays[workData.workDays.length - 1].date.substring(8, 10) : "00";
            const Day_Today = today.toISOString().substring(8, 10);
+
+             
+
+
+
+              
+           if (workData.workDays.length > 1 && graphsCoincidence) {
+            last_day_date = workData.workDays[workData.workDays.length - 2].date.substring(8, 10)
+            graphsCoincidence = !graphsCoincidence;
+           }
 
            if (last_day_date === Day_Today) {
               incomeData[incomeData.length - 1] = cumulativeIncome;
@@ -815,6 +838,15 @@ let selectedExpenseIndex = null;
         input2.id = "addInput2";
         input2.type = "number";
         addExpensePopup.appendChild(input2);
+        
+
+        const input23 = document.createElement('input');
+        input23.placeholder = 'rate per Hour';
+        input23.id = "hourlyRate";
+        input23.type = "number";
+        input23.value = workData.hourlyRate;
+        addExpensePopup.appendChild(input23);
+
 
         const addBtn = document.createElement('button');
         addBtn.textContent = 'Add Expected';
@@ -1246,7 +1278,9 @@ let selectedExpenseIndex = null;
             // Update workData
 
            // make it check the today's date So it will not add new day 2 times.
-       
+           console.log("barAddWorkDay")
+           console.log(workData.workDays)
+
            const last_day_date = 
            workData.workDays.length !== 0 ?
            workData.workDays[workData.workDays.length - 1].date.substring(8, 10) : "00";
@@ -1265,6 +1299,7 @@ let selectedExpenseIndex = null;
             workData.workDays.push(workDay);
             workData.totalEarned += earnedAmount;
             workData.remainingBalance += rrrem ;
+            graphsCoincidence = !graphsCoincidence;
            }
 
           
