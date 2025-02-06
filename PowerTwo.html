@@ -104,6 +104,21 @@
         .popup .cancel-btn:hover {
             background-color: #c82333;
         }
+        .add-expense-btn{
+            background-color: #007BFF;
+            position: absolute;
+            left: 55vw;
+            top: 44.5vh;
+        }
+        .expenses-popup-btn{
+            background-color: #0a3526;
+            position: absolute;
+            left: 66vw;
+            top: 48.5vh;
+            border-radius: 8px;
+            border: none;
+            color: white;
+        }
 
         /*//////////////////// Linear styles///////////////////////////////*/
        
@@ -126,9 +141,12 @@
             border-radius: 5px; width: 
             120px; text-align: center; 
         }
-        #setDataLinear , #setStartLinear { 
-            padding: 10px 20px; 
-            font-size: 16px; 
+        #setStartLinear { 
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index: 3;
+            font-size: 30%;
             background-color: #4CAF50; 
             color: white; 
             border: none; 
@@ -156,19 +174,6 @@
             text-align: center; 
             color: #333; 
         }
-        .reset-button { 
-            background-color: red; 
-            margin-top: 10px;
-            padding: 10px 20px; 
-            font-size: 16px; 
-            color: white; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer;  
-        }
-        .reset-button:hover { 
-            background-color: darkred; 
-            }
             /*//////////////paragraphs//////////////////*/
         #EntireStatement{
            
@@ -212,17 +217,6 @@
         .left:hover {
             opacity: 1;
             background-color: #f9f6f6;
-        }
-        #title_31{
-            color: green;
-            font-size: 130%;
-            margin: 0;
-        }
-        
-        #addWorkDayButton{
-            position: absolute;
-            top: 35%;
-            left: 0;
         }
         #chartBar {
             width: 50vw;
@@ -287,8 +281,9 @@
         /*///////////////////////swich months/////////////////////*/
         .monthButtonsContainer {
             position: absolute;
-            top: 1vh;
-            left: 25vw;
+            bottom: 0;
+            right: 0;
+            z-index: 3;
             display: flex;
             width: 320px;
             align-items: center;
@@ -370,8 +365,6 @@
             align-items: baseline;
             flex-direction: column;
         }
-       
-
         #MonthHours{
             font-size: 100%;
             background-color: red;
@@ -480,18 +473,11 @@ let currentMonthHours = 0;
 let MoneyLastMonth = 0;
 let MoneyThisMonth = 0;
 let graphsCoincidence = false;
-       
 
     const curMonth = new Date().getMonth() + 1; // Get month (1-12)
     const formMon = curMonth.toString().padStart(2, '0'); // Ensure two-digit format
     const MonthNow = Number(formMon);
-    const prevMMon = MonthNow - 1;
-
-   
-
-
-
-        
+    const prevMMon = MonthNow - 1;       
 let scalePizzaGraph = false;
 const nameOfTheMonth = "January";
 let monthName = "January";
@@ -566,14 +552,6 @@ let selectedExpenseIndex = null;
       
       let workData = budgetData.workData
      
-
-        // Set the default hourly rate in the input field
-        
-        
-       
-
-
-
         const BOX = {
         linearloadSavedData() {
             
@@ -696,14 +674,7 @@ let selectedExpenseIndex = null;
             remainingBalance: 0
         };
 
-        let total33 = 0;
-
-        workData.workDays.forEach(elem => {
-    
-        total33 += elem.hoursWorked
-
-        });
-         tritler.innerText = `Total_hours_${total33}`
+        
          
 
 
@@ -850,13 +821,14 @@ let selectedExpenseIndex = null;
         const addExpenseBtn = document.createElement('button');
         addExpenseBtn.classList.add('add-expense-btn');
         addExpenseBtn.id = `addExpenseBtn_${monthName}`;
-        addExpenseBtn.textContent = monthName;
+        addExpenseBtn.textContent =`New ${monthName} expence` ;
+        
         addExpenseBtn.onclick = BOX.pizzaOpenAddExpensePopup;
         document.body.appendChild(addExpenseBtn);
 
         const expensesPopupBtn = document.createElement('button');
         expensesPopupBtn.classList.add('expenses-popup-btn');
-        expensesPopupBtn.textContent = "Expenses";
+        expensesPopupBtn.textContent = "Existing expenses List";
         expensesPopupBtn.onclick = BOX.pizzaOpenExpensesPopup;
         document.body.appendChild(expensesPopupBtn);
 
@@ -1178,9 +1150,6 @@ let selectedExpenseIndex = null;
         pizzaOpenAddExpensePopup() {
         document.getElementById(`addExpensePopup_${monthName}`).style.display = 'block';
     },
-        pizzaCloseAddExpensePopup() {
-        document.getElementById(`addExpensePopup_${monthName}`).style.display = 'none';
-    },
         pizzaAddExpense() {
           
     const input1Element = document.getElementById("addInput1");
@@ -1417,13 +1386,9 @@ let selectedExpenseIndex = null;
             budgetData.workData = workData;
             localStorage.setItem('POWER' , JSON.stringify(budgetData));
             localStorage.setItem(monthName , JSON.stringify(budgetData));
-            
 
-
-         
-            
-             
            BOX.barUpdateDisplay();
+           BOX.pizzaCloseExpensesPopup();
           return rrrem
         },
         barUpdateChart() {
@@ -1607,10 +1572,11 @@ let selectedExpenseIndex = null;
             return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         }
             // const sss = workData.workDays[0].date || "2025-02-03T14:35:15.607Z"
-            let sss = "2025-01-01T14:35:15.607Z"
+            let sss = "2025-02-06T07:07:07.694Z"
             if (workData.workDays.length !== 0) {
                 sss = workData.workDays[0].date
             }
+
             const unex = JSON.parse(localStorage.getItem("POWER")) || POWER; 
             const totalt = unex.pizzaGraph[monthName].expenses
             let countTotalAmount = 0;
@@ -1623,7 +1589,7 @@ let selectedExpenseIndex = null;
 
          function averageMonthlySpending(days, totalSpent) {
 const daysInMonth = 30.4375; // Average days in a month (365.25 / 12)
-
+           console.log(` ${days} days from 2025-02-06`)
 // Calculate the daily spending rate
 let dailySpending = totalSpent / days;
 
@@ -1690,13 +1656,6 @@ calculateSustainability(AverageMoneySpent, go);
        return [AverageMoneySpent,go] 
 },
 
-
-
-
-
-
-
-
 }
 
 
@@ -1704,8 +1663,6 @@ window.onload = function() {
           BOX.currencyLoadData();
           BOX.currencyCalculateTotal();
         };
-
-
         BOX.pizzaCreateElements();
         BOX.pizzaUpdateChart();
         const ctx = document.getElementById('linearChart').getContext('2d');
@@ -1717,30 +1674,9 @@ window.onload = function() {
         BOX.linearUpdateChart();
        BOX.barUpdateDisplay();
        BOX.MonthSwicher(); 
-       
-
-
-        
-      
-
-       
        document.getElementById("MonthHours").innerText =
               `Previous Month hours: ${previousMonthHours} : ${MoneyLastMonth} PLN 
                Current Month hurs: ${currentMonthHours} : ${MoneyThisMonth} PLN`
-     
-     
-
-
-
-    
-
-   
-
-             
-
-
-
-
 
     </script>
 </body>
