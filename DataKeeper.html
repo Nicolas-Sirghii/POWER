@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Array in Local Storage</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+        }
+        button {
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Click the button to store data</h1>
+        <button id="setDataBtn">Set Data</button>
+    </div>
+
+    <script>
+      let numbersArray = {
+    "pizzaGraph": {
+        "January": {
+            "expenses": []
+        },
+        "February": {
+            "expenses": []
+        },
+        "March": {
+            "expenses": []
+        },
+        "April": {
+            "expenses": []
+        },
+        "May": {
+            "expenses": []
+        },
+        "June": {
+            "expenses": []
+        },
+        "July": {
+            "expenses": []
+        },
+        "August": {
+            "expenses": []
+        },
+        "September": {
+            "expenses": []
+        },
+        "October": {
+            "expenses": []
+        },
+        "November": {
+            "expenses": []
+        },
+        "December": {
+            "expenses": []
+        }
+    },
+    "linearGraph": {
+        "labels": [
+            "9/2 Sunday"
+        ],
+        "incomeData": [
+            "2330.77"
+        ],
+        "outcomeData": [
+            "2330.77"
+        ],
+        "cumulativeIncome": 2330.77,
+        "cumulativeOutcome": 2330.77
+    },
+    "currencyData": {
+        "balancePLN": "1000.00",
+        "balanceMDL": "1000.00",
+        "balanceEUR": "1000.00",
+        "balanceUSD": "1000.00",
+        "ratePLN": "4.06",
+        "rateMDL": "18.68",
+        "rateEUR": "0.97",
+        "bank": "plnBank"
+    },
+    "workData": {
+        "hourlyRate": 20,
+        "workDays": [],
+        "totalEarned": 0,
+        "remainingBalance": 0
+    },
+    "learnStore": {
+        "labels3": [
+            "2025-02-07"
+        ],
+        "redData3": [
+            0
+        ],
+        "greenData3": [
+            0
+        ]
+    }
+}
+
+        document.getElementById("setDataBtn").addEventListener("click", function() {
+            localStorage.setItem("POWER", JSON.stringify(numbersArray));
+            alert("Array has been stored in local storage!");
+        });
+    </script>
+</body>
+</html>
