@@ -425,6 +425,76 @@
             
             cursor: pointer;
         }
+        #selfImprovement{
+            position: absolute;
+            top: 2%;
+            left: 65%;
+        }
+        #workedHurs{
+            position: absolute;
+            top: 2%;
+            left: 15%;
+        }
+
+
+        #myChart3{
+            height: 100%;
+            width: 100%;
+            
+        }
+        #learn-input-container2 {
+            position: absolute;
+            left: 0;
+            top: 13vh;
+            width: 45vw;
+            height: 37vh;
+            background-color: white;
+            border-radius: 8px;
+           
+        }
+        .learn-input2 {
+            padding: 8px;
+            margin: 5px;
+        }
+        .learn-button2 {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        /*........................tmetracker...........................*/
+
+        #clock {
+            position: absolute;
+            bottom: 1vh;
+            left: 3vw;
+            font-size: 1vw;
+            font-weight: bold;
+            
+        }
+        .input-timeTrack {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        #Hours #Minutes{
+            padding: 10px;
+            font-size: 1em;
+            width: 80px;
+            text-align: center;
+            border-radius: 5px;
+            border: none;
+        }
+        #setTimeButton {
+            padding: 10px 15px;
+            font-size: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #setTimeButton:hover {
+            background-color: #45a049;
+        }
        
       
 </style>
@@ -487,11 +557,30 @@
 
 
         <button class="learn-button" onclick="LEARN.updateChart2()">Update Graph 2</button>
+        <button class="learn-button2" onclick="updateChart1()">Update Graph 1</button>
         <button class="learn-button" onclick="LEARN.resetCharts()">Reset Graphs</button>
         <input class="learn-input" type="number" id="redInput2" placeholder="Red">
             <input class="learn-input" type="number" id="greenInput2" placeholder="Green">   
+
         <div id="learn-input-container">
+            <div id="selfImprovement">SelfImproovement</div>
+            <div id="workedHurs">TotalHours</div>
             <canvas class="learn-canvas" id="myChart2"></canvas>        
+        </div>
+        <input class="learn-input2" type="number" id="redInput3" placeholder="Red2">
+        <input class="learn-input2" type="number" id="greenInput3" placeholder="Green2">
+    <div id="learn-input-container2">
+        <canvas class="learn-canvas2"  id="myChart3"></canvas>
+    </div>
+
+
+
+        <div id="clock">00:00:00:00</div>
+
+        <div class="input-timeTrack">
+            <input type="number" id="addHours" placeholder="Hours" min="0">
+            <input type="number" id="addMinutes" placeholder="Minutes" min="0">
+            <button id="setTimeButton" onclick="addTime()">Add</button>
         </div>
        
 
@@ -503,10 +592,14 @@
 let startingPoint = 0;
 let previousMonthHours = 0;
 let currentMonthHours = 0;
+let TotalHours = 0;
 let MoneyLastMonth = 0;
 let MoneyThisMonth = 0;
 let graphsCoincidence = false;
 let MainBankInSistem = "plnBank"
+let last_day_date = ""
+const today = new Date();
+const Day_Today = today.toISOString().substring(8, 10);
 
 const nameOfTheMonth = "January";
 let monthName = "January";
@@ -603,6 +696,9 @@ let selectedExpenseIndex = null;
 
       
       let workData = budgetData.workData
+      last_day_date = 
+           workData.workDays.length !== 0 ?
+           workData.workDays[workData.workDays.length - 1].date.substring(8, 10) : "00";
       
         const BOX = {
         linearloadSavedData() {
@@ -802,13 +898,13 @@ let selectedExpenseIndex = null;
             
             
            // make it check the today's date So it will not add new day 2 times.
-           const today = new Date();
-           let last_day_date = 
+           
+            last_day_date = 
            workData.workDays.length !== 0 ?
            workData.workDays[workData.workDays.length - 1].date.substring(8, 10) : "00";
-           const Day_Today = today.toISOString().substring(8, 10);
+           
 
-             
+          
 
 
 
@@ -1578,7 +1674,7 @@ let selectedExpenseIndex = null;
                 if (MonNumber === MonthNow) {
                     currentMonthHours += workDay.hoursWorked
                     MoneyThisMonth += (workDay.hoursWorked * workDay.hourlyRate)
-                } else {
+                } else if ((MonNumber + 1) === MonNumber) {
                     previousMonthHours += workDay.hoursWorked
                     MoneyLastMonth += (workDay.hoursWorked * workDay.hourlyRate)
                 }
@@ -2124,13 +2220,9 @@ window.onload = function() {
                     let greenValue = parseFloat(document.getElementById("greenInput2").value) || 0;
                     
                     labels2.push(LEARN.getCurrentDate());
-                    redData2.push((redData2[redData2.length - 1] + redValue) / 2);
-                    greenData2.push((greenData2[greenData2.length - 1] + greenValue) / 2);
+                    redData2.push((redData2[redData2.length - 1] + redValue) );
+                    greenData2.push((greenData2[greenData2.length - 1] + greenValue) );
                     
-                    // LEARN.saveChartData("labels2", labels2);
-                    // LEARN.saveChartData("redData2", redData2);
-                    // LEARN.saveChartData("greenData2", greenData2);
-
                     
                         const learnStore = {
                         labels3: labels2,
@@ -2141,11 +2233,16 @@ window.onload = function() {
                     localStorage.setItem("POWER" , JSON.stringify(budgetData));
 
                     
+
+                    
                     myChart2.update();
                 }
 
 
                }
+
+              
+               document.getElementById("selfImprovement").innerText =  `Improovement hours: ${budgetData.learnStore.greenData3[budgetData.learnStore.greenData3.length -1]}`
 
               const b = JSON.parse(localStorage.getItem("POWER")) || POWER;
               const {labels3 , redData3 , greenData3 } = b.learnStore;
@@ -2198,6 +2295,56 @@ window.onload = function() {
 
 
 
+        let labels1 = LEARN.loadChartData("labels3", [LEARN.getCurrentDate()]);
+        let redData1 = LEARN.loadChartData("redData3", [0]);
+        let greenData1 = LEARN.loadChartData("greenData3", [0]);
+        let ctx1 = document.getElementById("myChart3").getContext("2d");
+
+        let myChart3 = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: labels1,
+                datasets: [
+                    {
+                        label: 'Red',
+                        data: redData1,
+                        borderColor: 'red',
+                        fill: false,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Green',
+                        data: greenData1,
+                        borderColor: 'green',
+                        fill: false,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        function updateChart1() {
+            let redValue = parseFloat(document.getElementById("redInput3").value) || 0;
+            let greenValue = parseFloat(document.getElementById("greenInput3").value) || 0;
+            
+            labels1.push(LEARN.getCurrentDate());
+            redData1.push((redData1[redData1.length - 1] + redValue) / 2);
+            greenData1.push((greenData1[greenData1.length - 1] + greenValue) / 2);
+            
+            LEARN.saveChartData("labels3", labels1);
+            LEARN.saveChartData("redData3", redData1);
+            LEARN.saveChartData("greenData3", greenData1);
+            
+            myChart3.update();
+        }
 
 
 
@@ -2206,6 +2353,91 @@ window.onload = function() {
 
 
 
+
+
+
+
+
+
+
+/////////////////////////////time//////////////////////////////////////////////
+
+
+
+let a = [];
+    function   getCurrentDate() {
+                 let date = new Date();
+                 return date.toISOString().split('T')[0];
+                 }
+         
+        if(JSON.parse(localStorage.getItem("POWER"))){
+            a = JSON.parse(localStorage.getItem("POWER")) 
+        }
+
+        let TotttAl = 0;
+        a.workData.workDays.forEach(element => {
+          TotttAl +=  element.hoursWorked;
+        });
+       document.getElementById("workedHurs").innerText = `Job hours: ${TotttAl}`
+
+        let startTime = parseInt(localStorage.getItem("savedTime")) || 0; // Retrieve stored time
+        let lastSavedTimestamp = parseInt(localStorage.getItem("lastTimestamp")) || Date.now();
+        
+        // Adjust time for the duration the page was closed
+        let elapsedTime = Math.floor((Date.now() - lastSavedTimestamp) / 1000);
+        let timeInSeconds = startTime + elapsedTime;
+
+        function updateClock() {
+            let days = Math.floor(timeInSeconds / 86400).toString().padStart(2, '0'); 
+            let hours = Math.floor((timeInSeconds % 86400) / 3600).toString().padStart(2, '0');
+            let minutes = Math.floor((timeInSeconds % 3600) / 60).toString().padStart(2, '0');
+            let seconds = (timeInSeconds % 60).toString().padStart(2, '0');
+            document.getElementById("clock").textContent = `${days}:${hours}:${minutes}:${seconds}`;
+            timeInSeconds++;
+        }
+
+        function saveTime() {
+            localStorage.setItem("savedTime", timeInSeconds);
+            localStorage.setItem("lastTimestamp", Date.now()); // Save the exact close time
+            localStorage.setItem("PowerTime" , (timeInSeconds/3600).toFixed(2))
+
+            if (a.learnStore.greenData3.length > 0 ) {
+
+                if (last_day_date !== Day_Today) {
+                    a.learnStore.greenData3.push(Number((timeInSeconds/3600).toFixed(2)))
+                    a.learnStore.redData3.push(TotttAl)
+                    a.learnStore.labels3.push(getCurrentDate())
+                    localStorage.setItem("POWER" , JSON.stringify(a));
+                } else {
+                    a.learnStore.greenData3[a.learnStore.greenData3.length - 1] = Number((timeInSeconds/3600).toFixed(2))
+                    a.learnStore.redData3[a.learnStore.redData3.length - 1] = TotttAl;    
+                    localStorage.setItem("POWER" , JSON.stringify(a));
+                }
+                
+                
+            }
+            
+        }
+
+        function addTime() {
+            let addedHours = parseInt(document.getElementById("addHours").value) || 0;
+            let addedMinutes = parseInt(document.getElementById("addMinutes").value) || 0;
+            
+            let addedSeconds = (addedHours * 3600) + (addedMinutes * 60);
+            timeInSeconds += addedSeconds;
+
+            saveTime(); // Immediately update localStorage
+            updateClock(); // Immediately update the display
+        }
+
+        let timer = setInterval(updateClock, 1000);
+
+        window.addEventListener("beforeunload", saveTime);
+
+
+
+
+ 
 
 
 
