@@ -49,18 +49,18 @@
             "expenses": [
                 {
                     "category": "Food",
-                    "amount": -6.472906403940888,
-                    "expectedAmount": -6.472906403940888,
+                    "amount": -26.916256157635473,
+                    "expectedAmount": -26.916256157635473,
                     "unexpectedAmount": 0,
                     "expectedUsd": 0,
                     "expectedEur": 0,
                     "expectedMdl": 0,
-                    "expectedPln": -26.28,
+                    "expectedPln": -109.28,
                     "unexpectedUsd": 0,
                     "unexpectedEur": 0,
                     "unexpectedMdl": 0,
                     "unexpectedPln": 0,
-                    "currency": -26.28,
+                    "currency": -109.28,
                     "currency_name": "plnBank"
                 },
                 {
@@ -113,9 +113,9 @@
                 },
                 {
                     "category": "Internet",
-                    "amount": -0.024630541871921187,
+                    "amount": -2.4876847290640396,
                     "expectedAmount": -0.024630541871921187,
-                    "unexpectedAmount": 0,
+                    "unexpectedAmount": -2.4630541871921183,
                     "expectedUsd": 0,
                     "expectedEur": 0,
                     "expectedMdl": 0,
@@ -123,24 +123,24 @@
                     "unexpectedUsd": 0,
                     "unexpectedEur": 0,
                     "unexpectedMdl": 0,
-                    "unexpectedPln": 0,
-                    "currency": -0.1,
+                    "unexpectedPln": -10,
+                    "currency": -10.1,
                     "currency_name": "plnBank"
                 },
                 {
                     "category": "Alcohol",
-                    "amount": -0.024630541871921187,
-                    "expectedAmount": -0.024630541871921187,
-                    "unexpectedAmount": 0,
+                    "amount": -2.140394088669951,
+                    "expectedAmount": -1.1551724137931036,
+                    "unexpectedAmount": -0.9852216748768474,
                     "expectedUsd": 0,
                     "expectedEur": 0,
                     "expectedMdl": 0,
-                    "expectedPln": -0.1,
+                    "expectedPln": -4.6899999999999995,
                     "unexpectedUsd": 0,
                     "unexpectedEur": 0,
                     "unexpectedMdl": 0,
-                    "unexpectedPln": 0,
-                    "currency": -0.1,
+                    "unexpectedPln": -4,
+                    "currency": -8.69,
                     "currency_name": "plnBank"
                 },
                 {
@@ -194,19 +194,22 @@
     },
     "linearGraph": {
         "labels": [
-            "9/2 Sunday"
+            "9/2 Sunday",
+            "10/2 Monday"
         ],
         "incomeData": [
-            "1395.45"
+            "1395.45",
+            "1466.86"
         ],
         "outcomeData": [
-            "1395.45"
+            "1395.45",
+            "1370.43"
         ],
-        "cumulativeIncome": 1395.454137931035,
-        "cumulativeOutcome": 1395.454137931035
+        "cumulativeIncome": 1466.8605418719214,
+        "cumulativeOutcome": 1370.43197044335
     },
     "currencyData": {
-        "balancePLN": "5598.91",
+        "balancePLN": "5497.32",
         "balanceMDL": "75.56",
         "balanceEUR": "4.86",
         "balanceUSD": "7.36",
@@ -216,7 +219,7 @@
         "bank": "plnBank"
     },
     "workData": {
-        "hourlyRate": 20,
+        "hourlyRate": 27,
         "workDays": [
             {
                 "date": "2025-02-09T10:59:17.866Z",
@@ -233,26 +236,42 @@
                 "hourlyRate": 20,
                 "currency": "PLN",
                 "the_year": 2025
+            },
+            {
+                "date": "2025-02-10T14:17:35.640Z",
+                "hoursWorked": 14.5,
+                "remaining2": 71.40640394088669,
+                "earnedAmount": 391.5,
+                "expenses": 101.59,
+                "remainingBalance": 289.90999999999997,
+                "income": 0,
+                "salary": "",
+                "salaryDigit": 0,
+                "month_number": 2,
+                "day_number": 10,
+                "hourlyRate": 20,
+                "currency": "PLN",
+                "the_year": 2025
             }
         ],
         "totalEarned": 0,
-        "remainingBalance": -19.8
+        "remainingBalance": -93
     },
     "learnStore": {
         "labels3": [
-            "2025-02-07"
+            "2025-02-07",
+            "2025-02-10"
         ],
         "redData3": [
-            0
+            0,
+            14.5
         ],
         "greenData3": [
-            0
+            0,
+            1.68
         ]
     }
 }
-
-
-
 
         document.getElementById("setDataBtn").addEventListener("click", function() {
             localStorage.setItem("POWER", JSON.stringify(numbersArray));

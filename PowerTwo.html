@@ -619,6 +619,17 @@ let countExpectAmount = 0;
         let totalMdl = 0;
         let totalEur = 0;
 
+        ////////////////////time/////////////////////////
+        
+
+        let startTime = parseInt(localStorage.getItem("savedTime")) || 0; // Retrieve stored time
+        let lastSavedTimestamp = parseInt(localStorage.getItem("lastTimestamp")) || Date.now();
+        
+        // Adjust time for the duration the page was closed
+        let elapsedTime = Math.floor((Date.now() - lastSavedTimestamp) / 1000);
+        let timeInSeconds = startTime + elapsedTime;
+        ////////////////////////////time///////////////////////////////////////
+
     
 
 
@@ -694,6 +705,14 @@ let selectedExpenseIndex = null;
       (MainBankInSistem === "mdlBank") && (CurrentExchange = Number(budgetData.currencyData.rateMDL));
       (MainBankInSistem === "eurBank") && (CurrentExchange = Number(budgetData.currencyData.rateEUR));
 
+      let TotttAl = 0;
+        budgetData.workData.workDays.forEach(element => {
+          TotttAl +=  element.hoursWorked;
+        });
+       document.getElementById("workedHurs").innerText = `Job hours: ${TotttAl}`
+
+      
+
       
       let workData = budgetData.workData
       last_day_date = 
@@ -701,6 +720,11 @@ let selectedExpenseIndex = null;
            workData.workDays[workData.workDays.length - 1].date.substring(8, 10) : "00";
       
         const BOX = {
+        saveTime() {
+            localStorage.setItem("savedTime", timeInSeconds);
+            localStorage.setItem("lastTimestamp", Date.now()); // Save the exact close time
+            localStorage.setItem("PowerTime" , (timeInSeconds/3600).toFixed(2)) 
+        },
         linearloadSavedData() {
             
             const savedData = JSON.parse(localStorage.getItem("POWER")) || POWER;
@@ -1652,10 +1676,21 @@ let selectedExpenseIndex = null;
 
 
 
+                        function formatDate2(isoString) {
+                            const date = new Date(isoString);
+                            
+                            // Extract month and day
+                            const month = date.getMonth() + 1; // Months are zero-based
+                            const day = date.getDate();
+
+                            // Extract weekday name
+                            const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(date);
+                            
+                            return `${month}/${day}_${weekday}`;
+                        }
 
 
-
-                const dayDate = formatDate(today);
+                const dayDate = formatDate2(workDay.date);
                 
                 dayElement.innerHTML = `
                     <span class="ddate">${dayDate}
@@ -1770,6 +1805,18 @@ let selectedExpenseIndex = null;
            workData.workDays[workData.workDays.length - 1].date.substring(8, 10) : "00";
            const Day_Today = today.toISOString().substring(8, 10);
 
+
+           let sbar = 0;
+        budgetData.workData.workDays.forEach(element => {
+            sbar +=  element.hoursWorked;
+        });
+
+          sbar += hours;
+         
+        
+       document.getElementById("workedHurs").innerText = `Job hours: ${sbar}`
+       
+
            if (last_day_date === Day_Today) {
             const lastDayItem = workData.workDays[workData.workDays.length - 1];
             lastDayItem.date = today.toISOString();
@@ -1780,13 +1827,28 @@ let selectedExpenseIndex = null;
             lastDayItem.income += theIncome;
             lastDayItem.remaining2 += remaining2
 
+
+            budgetData.learnStore.greenData3[budgetData.learnStore.greenData3.length - 1] = Number((timeInSeconds/3600).toFixed(2))
+            budgetData.learnStore.redData3[budgetData.learnStore.redData3.length - 1] = sbar;    
+            localStorage.setItem("POWER" , JSON.stringify(budgetData));
+
            } else {
             workData.workDays.push(workDay);
             workData.totalEarned += earnedAmount;
             workData.remainingBalance += rrrem ;
             graphsCoincidence = !graphsCoincidence;
+
+
+            budgetData.learnStore.greenData3.push(Number((timeInSeconds/3600).toFixed(2)))
+            budgetData.learnStore.redData3.push(sbar)
+            budgetData.learnStore.labels3.push(getCurrentDate())
+            localStorage.setItem("POWER" , JSON.stringify(budgetData));
            }
 
+
+           BOX.saveTime();
+           LEARN.UpdateJustChart()
+           document.getElementById("selfImprovement").innerText =  `Improovement hours: ${budgetData.learnStore.greenData3[budgetData.learnStore.greenData3.length -1]}`
           
             
             if (expences > 0) {
@@ -2214,6 +2276,9 @@ window.onload = function() {
                    
             
                  },
+                 UpdateJustChart() {
+                    myChart2.update();
+                 },
                  updateChart2() {
                     
                     let redValue = parseFloat(document.getElementById("redInput2").value) || 0;
@@ -2362,8 +2427,6 @@ window.onload = function() {
 
 /////////////////////////////time//////////////////////////////////////////////
 
-
-
 let a = [];
     function   getCurrentDate() {
                  let date = new Date();
@@ -2374,18 +2437,7 @@ let a = [];
             a = JSON.parse(localStorage.getItem("POWER")) 
         }
 
-        let TotttAl = 0;
-        a.workData.workDays.forEach(element => {
-          TotttAl +=  element.hoursWorked;
-        });
-       document.getElementById("workedHurs").innerText = `Job hours: ${TotttAl}`
-
-        let startTime = parseInt(localStorage.getItem("savedTime")) || 0; // Retrieve stored time
-        let lastSavedTimestamp = parseInt(localStorage.getItem("lastTimestamp")) || Date.now();
-        
-        // Adjust time for the duration the page was closed
-        let elapsedTime = Math.floor((Date.now() - lastSavedTimestamp) / 1000);
-        let timeInSeconds = startTime + elapsedTime;
+  
 
         function updateClock() {
             let days = Math.floor(timeInSeconds / 86400).toString().padStart(2, '0'); 
@@ -2395,28 +2447,13 @@ let a = [];
             document.getElementById("clock").textContent = `${days}:${hours}:${minutes}:${seconds}`;
             timeInSeconds++;
         }
-
+       
+         
         function saveTime() {
             localStorage.setItem("savedTime", timeInSeconds);
             localStorage.setItem("lastTimestamp", Date.now()); // Save the exact close time
             localStorage.setItem("PowerTime" , (timeInSeconds/3600).toFixed(2))
 
-            if (a.learnStore.greenData3.length > 0 ) {
-
-                if (last_day_date !== Day_Today) {
-                    a.learnStore.greenData3.push(Number((timeInSeconds/3600).toFixed(2)))
-                    a.learnStore.redData3.push(TotttAl)
-                    a.learnStore.labels3.push(getCurrentDate())
-                    localStorage.setItem("POWER" , JSON.stringify(a));
-                } else {
-                    a.learnStore.greenData3[a.learnStore.greenData3.length - 1] = Number((timeInSeconds/3600).toFixed(2))
-                    a.learnStore.redData3[a.learnStore.redData3.length - 1] = TotttAl;    
-                    localStorage.setItem("POWER" , JSON.stringify(a));
-                }
-                
-                
-            }
-            
         }
 
         function addTime() {
