@@ -129,9 +129,9 @@
                 },
                 {
                     "category": "Alcohol",
-                    "amount": -2.140394088669951,
+                    "amount": -4.554187192118228,
                     "expectedAmount": -1.1551724137931036,
-                    "unexpectedAmount": -0.9852216748768474,
+                    "unexpectedAmount": -3.3990147783251237,
                     "expectedUsd": 0,
                     "expectedEur": 0,
                     "expectedMdl": 0,
@@ -139,8 +139,8 @@
                     "unexpectedUsd": 0,
                     "unexpectedEur": 0,
                     "unexpectedMdl": 0,
-                    "unexpectedPln": -4,
-                    "currency": -8.69,
+                    "unexpectedPln": -13.8,
+                    "currency": -18.490000000000002,
                     "currency_name": "plnBank"
                 },
                 {
@@ -195,21 +195,27 @@
     "linearGraph": {
         "labels": [
             "9/2 Sunday",
-            "10/2 Monday"
+            "10/2 Monday",
+            "11/2 Tuesday",
+            "12/2 Wednesday"
         ],
         "incomeData": [
             "1395.45",
-            "1466.86"
+            "1466.86",
+            "1560.88",
+            "1624.05"
         ],
         "outcomeData": [
             "1395.45",
-            "1370.43"
+            "1370.43",
+            "1368.02",
+            "1368.02"
         ],
-        "cumulativeIncome": 1466.8605418719214,
-        "cumulativeOutcome": 1370.43197044335
+        "cumulativeIncome": 1624.0526600985224,
+        "cumulativeOutcome": 1368.0181773399017
     },
     "currencyData": {
-        "balancePLN": "5497.32",
+        "balancePLN": "5487.52",
         "balanceMDL": "75.56",
         "balanceEUR": "4.86",
         "balanceUSD": "7.36",
@@ -252,27 +258,84 @@
                 "hourlyRate": 20,
                 "currency": "PLN",
                 "the_year": 2025
+            },
+            {
+                "date": "2025-02-11T17:47:57.759Z",
+                "hoursWorked": 14.5,
+                "remaining2": 94.01477832512316,
+                "earnedAmount": 391.5,
+                "expenses": 9.8,
+                "remainingBalance": 381.7,
+                "income": 0,
+                "salary": "",
+                "salaryDigit": 0,
+                "month_number": 2,
+                "day_number": 11,
+                "hourlyRate": 27,
+                "currency": "PLN",
+                "the_year": 2025
+            },
+            {
+                "date": "2025-02-12T14:06:16.041Z",
+                "hoursWorked": 9.5,
+                "remaining2": 63.177339901477836,
+                "earnedAmount": 256.5,
+                "expenses": 0,
+                "remainingBalance": 256.5,
+                "income": 0,
+                "salary": "",
+                "salaryDigit": 0,
+                "month_number": 2,
+                "day_number": 12,
+                "hourlyRate": 27,
+                "currency": "PLN",
+                "the_year": 2025
             }
         ],
-        "totalEarned": 0,
-        "remainingBalance": -93
+        "totalEarned": 648,
+        "remainingBalance": 545.2
     },
     "learnStore": {
         "labels3": [
             "2025-02-07",
-            "2025-02-10"
+            "2025-02-10",
+            "2025-02-11",
+            "2025-02-12"
         ],
         "redData3": [
             0,
-            14.5
+            14.5,
+            29,
+            38.5
         ],
         "greenData3": [
             0,
-            1.68
+            1.68,
+            4.17,
+            6.17
+        ]
+    },
+    "progressLearn": {
+        "labels": [
+            "2025-02-12",
+            "2025-02-12",
+            "2025-02-12",
+            "2025-02-12"
+        ],
+        "redData": [
+            0,
+            628,
+            628,
+            628
+        ],
+        "greenData": [
+            0,
+            510,
+            510,
+            510
         ]
     }
 }
-
         document.getElementById("setDataBtn").addEventListener("click", function() {
             localStorage.setItem("POWER", JSON.stringify(numbersArray));
             alert("Array has been stored in local storage!");

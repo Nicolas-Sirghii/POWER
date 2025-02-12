@@ -445,9 +445,9 @@
         #learn-input-container2 {
             position: absolute;
             left: 0;
-            top: 13vh;
+            top: 0;
             width: 45vw;
-            height: 37vh;
+            height: 49vh;
             background-color: white;
             border-radius: 8px;
            
@@ -471,21 +471,19 @@
             
         }
         .input-timeTrack {
+            position: absolute;
+            bottom: 3vh;
+            left: 2vw;
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
         }
-        #Hours #Minutes{
-            padding: 10px;
-            font-size: 1em;
-            width: 80px;
-            text-align: center;
-            border-radius: 5px;
-            border: none;
+        .input-timeTrack input {
+            height: 2vh;
         }
+       
         #setTimeButton {
-            padding: 10px 15px;
-            font-size: 1em;
+          
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -556,19 +554,15 @@
         <p id="sustaining">sustaining</p>
 
 
-        <button class="learn-button" onclick="LEARN.updateChart2()">Update Graph 2</button>
-        <button class="learn-button2" onclick="updateChart1()">Update Graph 1</button>
-        <button class="learn-button" onclick="LEARN.resetCharts()">Reset Graphs</button>
-        <input class="learn-input" type="number" id="redInput2" placeholder="Red">
-            <input class="learn-input" type="number" id="greenInput2" placeholder="Green">   
+        
+    
 
         <div id="learn-input-container">
             <div id="selfImprovement">SelfImproovement</div>
             <div id="workedHurs">TotalHours</div>
             <canvas class="learn-canvas" id="myChart2"></canvas>        
         </div>
-        <input class="learn-input2" type="number" id="redInput3" placeholder="Red2">
-        <input class="learn-input2" type="number" id="greenInput3" placeholder="Green2">
+       
     <div id="learn-input-container2">
         <canvas class="learn-canvas2"  id="myChart3"></canvas>
     </div>
@@ -588,7 +582,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        
+    localStorage.setItem("lastTimestamp", Date.now()); // Save the exact close time    
 let startingPoint = 0;
 let previousMonthHours = 0;
 let currentMonthHours = 0;
@@ -1843,6 +1837,8 @@ let selectedExpenseIndex = null;
             budgetData.learnStore.redData3.push(sbar)
             budgetData.learnStore.labels3.push(getCurrentDate())
             localStorage.setItem("POWER" , JSON.stringify(budgetData));
+
+            LEARN.updateChart1();
            }
 
 
@@ -2278,12 +2274,10 @@ window.onload = function() {
                  },
                  UpdateJustChart() {
                     myChart2.update();
+                    
                  },
                  updateChart2() {
-                    
-                    let redValue = parseFloat(document.getElementById("redInput2").value) || 0;
-                    let greenValue = parseFloat(document.getElementById("greenInput2").value) || 0;
-                    
+              
                     labels2.push(LEARN.getCurrentDate());
                     redData2.push((redData2[redData2.length - 1] + redValue) );
                     greenData2.push((greenData2[greenData2.length - 1] + greenValue) );
@@ -2298,10 +2292,47 @@ window.onload = function() {
                     localStorage.setItem("POWER" , JSON.stringify(budgetData));
 
                     
-
+                    LEARN.updateChart1()
                     
                     myChart2.update();
-                }
+                },
+                updateChart1() {
+                    let redValue =  0;
+                    let greenValue =  0;
+
+                    const targetProgress = JSON.parse(localStorage.getItem("learnProgress"))
+                
+                        targetProgress.forEach(element => {
+                            greenValue +=  Number(element.end)
+                            redValue += element.totalEnd
+                            
+                        });
+            
+            
+                    
+                
+                    
+                    labels1.push(LEARN.getCurrentDate());
+                    redData1.push(redValue);
+                    greenData1.push(greenValue);
+
+
+                    budgetData.progressLearn.redData = redData1;
+                    budgetData.progressLearn.greenData = greenData1;
+                    budgetData.progressLearn.labels = labels1;
+            
+                   localStorage.setItem("POWER",JSON.stringify(budgetData))
+
+
+
+
+                    
+                    LEARN.saveChartData("TTTargetLabels", labels1);
+                    LEARN.saveChartData("TTTargetRed", redData1);
+                    LEARN.saveChartData("TTTargetGreen", greenData1);
+                    
+                    myChart3.update();
+        },
 
 
                }
@@ -2360,10 +2391,11 @@ window.onload = function() {
 
 
 
-        let labels1 = LEARN.loadChartData("labels3", [LEARN.getCurrentDate()]);
-        let redData1 = LEARN.loadChartData("redData3", [0]);
-        let greenData1 = LEARN.loadChartData("greenData3", [0]);
+        let labels1 = budgetData.progressLearn.labels;
+        let redData1 = budgetData.progressLearn.redData;
+        let greenData1 = budgetData.progressLearn.greenData;
         let ctx1 = document.getElementById("myChart3").getContext("2d");
+
 
         let myChart3 = new Chart(ctx1, {
             type: 'line',
@@ -2395,34 +2427,6 @@ window.onload = function() {
                 }
             }
         });
-
-        function updateChart1() {
-            let redValue = parseFloat(document.getElementById("redInput3").value) || 0;
-            let greenValue = parseFloat(document.getElementById("greenInput3").value) || 0;
-            
-            labels1.push(LEARN.getCurrentDate());
-            redData1.push((redData1[redData1.length - 1] + redValue) / 2);
-            greenData1.push((greenData1[greenData1.length - 1] + greenValue) / 2);
-            
-            LEARN.saveChartData("labels3", labels1);
-            LEARN.saveChartData("redData3", redData1);
-            LEARN.saveChartData("greenData3", greenData1);
-            
-            myChart3.update();
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 /////////////////////////////time//////////////////////////////////////////////
@@ -2463,6 +2467,10 @@ let a = [];
             let addedSeconds = (addedHours * 3600) + (addedMinutes * 60);
             timeInSeconds += addedSeconds;
 
+            document.getElementById("addHours").value = ""
+            document.getElementById("addMinutes").value = ""
+
+            
             saveTime(); // Immediately update localStorage
             updateClock(); // Immediately update the display
         }
@@ -2482,6 +2490,7 @@ let a = [];
 
 
 
+  
 
       console.log(budgetData)
     </script>
