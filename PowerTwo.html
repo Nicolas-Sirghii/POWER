@@ -493,6 +493,17 @@
         #setTimeButton:hover {
             background-color: #45a049;
         }
+        #learnen3{
+            position: absolute;
+            width: 100%;
+            height: 4vh;
+            top: 0;
+            border: 1px solid red;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            
+        }
        
       
 </style>
@@ -564,6 +575,11 @@
         </div>
        
     <div id="learn-input-container2">
+        <div id="learnen3">
+            <p id="toBeLearned3">To be learned:</p>
+            <p id="learned3">Learned:</p>
+        </div>
+        
         <canvas class="learn-canvas2"  id="myChart3"></canvas>
     </div>
 
@@ -705,8 +721,35 @@ let selectedExpenseIndex = null;
         });
        document.getElementById("workedHurs").innerText = `Job hours: ${TotttAl}`
 
-      
 
+
+
+
+
+
+                    let re =  0;
+                    let gre =  0;
+
+                    
+
+                    let tar = [];
+
+                    if (localStorage.getItem("learnProgress")) {
+                        
+                        tar = JSON.parse(localStorage.getItem("learnProgress"));
+
+                        tar.forEach(element => {
+                            gre +=  Number(element.end)
+                            re += element.totalEnd
+                            
+                        });
+                    }
+
+       document.getElementById("toBeLearned3").innerText = `To be learned: ${re}`
+       document.getElementById("learned3").innerText = `Learned: ${gre}`
+
+      
+    
       
       let workData = budgetData.workData
       last_day_date = 
@@ -2300,13 +2343,26 @@ window.onload = function() {
                     let redValue =  0;
                     let greenValue =  0;
 
-                    const targetProgress = JSON.parse(localStorage.getItem("learnProgress"))
-                
+                    
+
+                    let targetProgress = [];
+
+                    if (localStorage.getItem("learnProgress")) {
+                        
+                        targetProgress = JSON.parse(localStorage.getItem("learnProgress"));
+
                         targetProgress.forEach(element => {
                             greenValue +=  Number(element.end)
                             redValue += element.totalEnd
                             
                         });
+                        
+                    }
+
+                     document.getElementById("toBeLearned3").innerText = `To be learned: ${redValue}`
+                     document.getElementById("learned3").innerText = `Learned: ${greenValue}`
+                
+                        
             
             
                     
@@ -2422,7 +2478,7 @@ window.onload = function() {
                 responsive: true,
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: false
                     }
                 }
             }
